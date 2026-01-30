@@ -1,0 +1,221 @@
+<x-admin-layout>
+    <x-slot name="header">
+        {{ __('Laporan Keuangan') }}
+    </x-slot>
+
+    <div class="space-y-6">
+        <!-- Header & Date Filter -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Ringkasan Bulan Ini</h2>
+                <p class="text-slate-500 text-sm">Laporan keuangan periode {{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y') }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Month Filter (Simple for now) -->
+                <form action="{{ route('reports.index') }}" method="GET" class="flex items-center gap-2">
+                    <select name="month" class="rounded-lg border-slate-200 text-sm focus:ring-pink-500 focus:border-pink-500 text-slate-900 cursor-pointer">
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}" {{ request('month', now()->month) == $i ? 'selected' : '' }}>
+                                {{ date('F', mktime(0, 0, 0, $i, 1)) }}
+                            </option>
+                        @endfor
+                    </select>
+                    <select name="year" class="rounded-lg border-slate-200 text-sm focus:ring-pink-500 focus:border-pink-500 text-slate-900 cursor-pointer">
+                        @php $currentYear = now()->year; @endphp
+                        @for($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
+                            <option value="{{ $y }}" {{ request('year', $currentYear) == $y ? 'selected' : '' }}>
+                                {{ $y }}
+                            </option>
+                        @endfor
+                    </select>
+                    <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-sm">
+                        Filter
+                    </button>
+                </form>
+                
+                <!-- Print Button -->
+                <a href="{{ route('reports.print', ['month' => request('month', now()->month), 'year' => request('year', now()->year)]) }}" target="_blank" class="px-6 py-2 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 shadow-sm flex items-center gap-2">
+                    <svg class="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <span>Cetak</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <!-- Summary Cards -->
+        <!-- Summary Cards (Chart Style) -->
+        <!-- Summary Cards (Vertical List Style) -->
+        <div class="flex flex-col gap-4">
+            <!-- Pemasukan (Dark Navy) -->
+            <div class="bg-green-700 rounded-2xl p-5 px-8 flex items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                <div class="flex items-center gap-4 z-10">
+                    <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white tracking-wide uppercase">PEMASUKAN</h3>
+                </div>
+                <div class="text-right z-10">
+                    <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h2>
+                    <div class="flex items-center justify-end gap-1 text-slate-400 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        <span>Total Omset Bulan Ini</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengeluaran (Red) -->
+            <div class="bg-red-600 rounded-2xl p-5 px-8 flex items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                <div class="flex items-center gap-4 z-10">
+                    <div class="w-12 h-12 rounded-xl bg-red-700/50 flex items-center justify-center border border-red-500/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white tracking-wide uppercase">PENGELUARAN</h3>
+                </div>
+                <div class="text-right z-10">
+                    <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalCost, 0, ',', '.') }}</h2>
+                    <div class="flex items-center justify-end gap-1 text-red-100 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                        <span>Total Modal (HPP)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laba Bersih (Blue) -->
+            <div class="bg-blue-600 rounded-2xl p-5 px-8 flex items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+                <div class="flex items-center gap-4 z-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-700/50 flex items-center justify-center border border-blue-500/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white tracking-wide uppercase">LABA BERSIH</h3>
+                        <div class="flex items-center gap-1 text-blue-100 text-xs font-medium mt-0.5">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            <span>Keuntungan Bersih</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right z-10">
+                     <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h2>
+                    <div class="flex items-center justify-end gap-1 text-blue-100 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        <span>Keuntungan Bersih</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Chart -->
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100/50 mt-8">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">Grafik Penjualan Harian</h3>
+                    <p class="text-sm text-slate-500 font-medium">Periode: {{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y') }}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-full border border-indigo-100">Bulan Ini</span>
+                </div>
+            </div>
+            
+            <div class="h-96 w-full relative">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // Custom Gradient for bars if needed, but we use controller colors
+            
+            const chartData = {
+                labels: @json($chartLabels),
+                datasets: @json($chartDatasets)
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: { family: "'Outfit', sans-serif", weight: 500, size: 12 },
+                                color: '#64748b'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
+                            bodyFont: { family: "'Outfit', sans-serif", size: 13 },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            },
+                            displayColors: true,
+                            boxPadding: 4
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            grid: { 
+                                color: '#f1f5f9', 
+                                borderDash: [5, 5],
+                                drawBorder: false 
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: "'Outfit', sans-serif", size: 11 },
+                                callback: function(value) {
+                                    if (value >= 1000000) return 'Rp ' + (value/1000000) + 'jt';
+                                    if (value >= 1000) return 'Rp ' + (value/1000) + 'rb';
+                                    return value;
+                                },
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                             ticks: {
+                                color: '#64748b',
+                                font: { family: "'Outfit', sans-serif", size: 11 }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</x-admin-layout>
