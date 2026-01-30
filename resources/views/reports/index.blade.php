@@ -61,7 +61,7 @@
         <!-- Summary Cards (Vertical List Style) -->
         <div class="flex flex-col gap-4">
             <!-- Pemasukan (Dark Navy) -->
-            <div class="bg-green-700 rounded-2xl p-5 px-8 flex items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
+            <div class="bg-green-600 rounded-2xl p-5 px-8 flex items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
                 <div class="flex items-center gap-4 z-10">
                     <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -70,7 +70,7 @@
                 </div>
                 <div class="text-right z-10">
                     <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h2>
-                    <div class="flex items-center justify-end gap-1 text-slate-400 text-sm font-medium">
+                    <div class="flex items-center justify-end gap-1 text-white text-slate-200 text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         <span>Total Omset Bulan Ini</span>
                     </div>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="text-right z-10">
                     <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalCost, 0, ',', '.') }}</h2>
-                    <div class="flex items-center justify-end gap-1 text-red-100 text-sm font-medium">
+                    <div class="flex items-center justify-end gap-1 text-white text-slate-200 text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
                         <span>Total Modal (HPP)</span>
                     </div>
@@ -110,7 +110,7 @@
                 </div>
                 <div class="text-right z-10">
                      <h2 class="text-3xl font-bold text-white mb-1">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h2>
-                    <div class="flex items-center justify-end gap-1 text-blue-100 text-sm font-medium">
+                    <div class="flex items-center justify-end gap-1 text-white text-slate-200 text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         <span>Keuntungan Bersih</span>
                     </div>
@@ -160,22 +160,25 @@
                             labels: {
                                 usePointStyle: true,
                                 pointStyle: 'circle',
-                                padding: 20,
-                                font: { family: "'Outfit', sans-serif", weight: 500, size: 12 },
+                                padding: 25,
+                                font: { family: "'Outfit', sans-serif", weight: 600, size: 12 },
                                 color: '#64748b'
                             }
                         },
                         tooltip: {
                             mode: 'index',
                             intersect: false,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            titleColor: '#1e293b',
-                            bodyColor: '#475569',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#0f172a',
+                            bodyColor: '#334155',
                             borderColor: '#e2e8f0',
                             borderWidth: 1,
-                            padding: 12,
+                            padding: 16,
+                            cornerRadius: 12,
                             titleFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
-                            bodyFont: { family: "'Outfit', sans-serif", size: 13 },
+                            bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: '500' },
+                            displayColors: true,
+                            boxPadding: 6,
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
@@ -186,8 +189,10 @@
                                     return label;
                                 }
                             },
-                            displayColors: true,
-                            boxPadding: 4
+                            shadowOffsetX: 0,
+                            shadowOffsetY: 4,
+                            shadowBlur: 20,
+                            shadowColor: 'rgba(0, 0, 0, 0.1)' 
                         }
                     },
                     scales: {
@@ -196,15 +201,15 @@
                             border: { display: false },
                             grid: { 
                                 color: '#f1f5f9', 
-                                borderDash: [5, 5],
+                                borderDash: [6, 6],
                                 drawBorder: false 
                             },
                             ticks: {
                                 color: '#94a3b8',
-                                font: { family: "'Outfit', sans-serif", size: 11 },
+                                font: { family: "'Outfit', sans-serif", size: 11, weight: '500' },
                                 callback: function(value) {
-                                    if (value >= 1000000) return 'Rp ' + (value/1000000) + 'jt';
-                                    if (value >= 1000) return 'Rp ' + (value/1000) + 'rb';
+                                    if (value >= 1000000) return (value/1000000) + 'jt';
+                                    if (value >= 1000) return (value/1000) + 'k';
                                     return value;
                                 },
                                 padding: 10
@@ -214,7 +219,7 @@
                             grid: { display: false, drawBorder: false },
                              ticks: {
                                 color: '#64748b',
-                                font: { family: "'Outfit', sans-serif", size: 11 }
+                                font: { family: "'Outfit', sans-serif", size: 11, weight: '600' }
                             }
                         }
                     },
@@ -224,12 +229,15 @@
                     },
                     elements: {
                         bar: {
-                            borderRadius: 6,
-                            borderSkipped: false
+                            borderRadius: 100, // Fully rounded pill shape
+                            borderSkipped: false // Round both ends
                         }
-                    }
+                    },
+                    barThickness: 12, // Thin bars
+                    maxBarThickness: 16
                 }
             });
+
         });
     </script>
 </x-admin-layout>
