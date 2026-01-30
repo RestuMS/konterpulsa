@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        {{ __('Product Management') }}
+        {{ __('Transaction Management') }}
     </x-slot>
 
     <div class="mb-6 flex justify-between items-center">
@@ -134,7 +134,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-black font-bold">
+                    <tr class="bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-white font-bold">
                         <th class="px-6 py-4 rounded-tl-lg">Provider</th>
                         <th class="px-6 py-4">Produk</th>
                         <th class="px-6 py-4">Kategori</th>

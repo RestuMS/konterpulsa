@@ -11,32 +11,46 @@
                 <p class="text-slate-500 text-sm">Laporan keuangan periode {{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y') }}</p>
             </div>
             <div class="flex items-center gap-3">
-                <!-- Month Filter (Simple for now) -->
-                <form action="{{ route('reports.index') }}" method="GET" class="flex items-center gap-2">
-                    <select name="month" class="rounded-lg border-slate-200 text-sm focus:ring-pink-500 focus:border-pink-500 text-slate-900 cursor-pointer">
-                        @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}" {{ request('month', now()->month) == $i ? 'selected' : '' }}>
-                                {{ date('F', mktime(0, 0, 0, $i, 1)) }}
-                            </option>
-                        @endfor
-                    </select>
-                    <select name="year" class="rounded-lg border-slate-200 text-sm focus:ring-pink-500 focus:border-pink-500 text-slate-900 cursor-pointer">
-                        @php $currentYear = now()->year; @endphp
-                        @for($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
-                            <option value="{{ $y }}" {{ request('year', $currentYear) == $y ? 'selected' : '' }}>
-                                {{ $y }}
-                            </option>
-                        @endfor
-                    </select>
-                    <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium shadow-sm">
-                        Filter
+                <!-- Filter Form -->
+                <form action="{{ route('reports.index') }}" method="GET" class="flex items-center gap-3">
+                    <!-- Month Select -->
+                    <div class="relative group">
+                        <select name="month" class="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer hover:bg-white hover:border-slate-300 shadow-sm">
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ request('month', now()->month) == $i ? 'selected' : '' }}>
+                                    {{ date('F', mktime(0, 0, 0, $i, 1)) }}
+                                </option>
+                            @endfor
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 group-hover:text-blue-500 transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Year Select -->
+                    <div class="relative group">
+                        <select name="year" class="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer hover:bg-white hover:border-slate-300 shadow-sm">
+                            @php $currentYear = now()->year; @endphp
+                            @for($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
+                                <option value="{{ $y }}" {{ request('year', $currentYear) == $y ? 'selected' : '' }}>
+                                    {{ $y }}
+                                </option>
+                            @endfor
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 group-hover:text-blue-500 transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="p-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                     </button>
                 </form>
                 
                 <!-- Print Button -->
-                <a href="{{ route('reports.print', ['month' => request('month', now()->month), 'year' => request('year', now()->year)]) }}" target="_blank" class="px-6 py-2 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 shadow-sm flex items-center gap-2">
-                    <svg class="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    <span>Cetak</span>
+                <a href="{{ route('reports.print', ['month' => request('month', now()->month), 'year' => request('year', now()->year)]) }}" target="_blank" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 shadow-sm transition-all flex items-center gap-2 group">
+                    <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <span>Cetak PDF</span>
                 </a>
             </div>
         </div>
