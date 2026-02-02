@@ -18,17 +18,35 @@
     @endif
 
     <!-- Search Form -->
+    <!-- Search & Filter Form -->
     <div class="mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-        <form action="{{ route('products.index') }}" method="GET" class="relative flex items-center">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <form action="{{ route('products.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+            
+            <!-- Search Input -->
+            <div class="relative flex-grow">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode atau nama produk..." class="w-full pl-12 pr-4 py-3 border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-slate-700 placeholder-slate-400 shadow-sm transition-all">
             </div>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode atau nama produk..." class="w-full pl-12 pr-10 py-3 border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-slate-700 placeholder-slate-400 shadow-sm transition-all">
-            @if(request('search'))
-                <a href="{{ route('products.index') }}" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-red-500 transition-colors" title="Hapus pencarian">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </a>
-            @endif
+
+            <!-- Date Input -->
+            <div class="relative md:w-1/4">
+                <input type="date" name="date" value="{{ request('date') }}" class="w-full pl-4 pr-10 py-3 border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 text-slate-700 shadow-sm transition-all" title="Filter berdasarkan tanggal">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2">
+                <button type="submit" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors shadow-sm">
+                    Filter
+                </button>
+                @if(request('search') || request('date'))
+                    <a href="{{ route('products.index') }}" class="px-4 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors border border-red-100 flex items-center justify-center" title="Reset Filter">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </a>
+                @endif
+            </div>
+
         </form>
     </div>
 
@@ -135,7 +153,8 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-white font-bold">
-                        <th class="px-6 py-4 rounded-tl-lg">Provider</th>
+                        <th class="px-6 py-4 rounded-tl-lg">Tanggal</th>
+                        <th class="px-6 py-4">Provider</th>
                         <th class="px-6 py-4">Produk</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Pelanggan</th>
@@ -149,6 +168,11 @@
                 <tbody class="divide-y divide-slate-100 text-slate-600">
                     @forelse($products as $product)
                         <tr class="group hover:bg-slate-50/80 transition-all duration-200">
+                            <!-- Tanggal -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-bold text-slate-600 block">{{ $product->created_at->format('d M Y') }}</span>
+                            </td>
+
                             <!-- Provider -->
                             <td class="px-6 py-4">
                                 <span class="inline-block px-3 py-1 rounded-lg bg-slate-800 text-white font-mono text-xs font-bold tracking-wide shadow-sm">
@@ -240,7 +264,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="p-12 text-center">
+                            <td colspan="10" class="p-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <svg class="w-16 h-16 mb-4 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                     <p class="text-lg font-medium text-slate-500">Belum ada transaksi</p>

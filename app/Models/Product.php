@@ -17,6 +17,7 @@ class Product extends Model
         'image',
         'payment_status',
         'customer_name',
+        'created_at',
     ];
 
     public function category()

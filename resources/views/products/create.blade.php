@@ -18,6 +18,17 @@
                 @csrf
 
                 <div class="space-y-6">
+
+                    <!-- Tanggal Transaksi (Optional) -->
+                    <div class="group">
+                        <label for="created_at" class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Transaksi <span class="text-slate-400 font-normal text-xs">(Opsional - Untuk input tanggal mundur)</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <input type="date" name="created_at" id="created_at" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium cursor-pointer">
+                        </div>
+                    </div>
                     
                     <!-- Nama Produk -->
                     <div class="group">
@@ -62,7 +73,7 @@
                                 </div>
                                 <select name="code" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium appearance-none cursor-pointer">
                                     <option value="" disabled selected>Pilih Provider</option>
-                                    @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat'] as $provider)
+                                    @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai'] as $provider)
                                         <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
                                     @endforeach
                                 </select>
