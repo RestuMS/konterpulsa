@@ -182,8 +182,15 @@
                             
                             <!-- Produk Name -->
                             <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800 text-base md:text-sm group-hover:text-pink-600 transition-colors">
-                                    {{ $product->name }}
+                                <div class="flex items-center gap-2">
+                                    <div class="font-bold text-slate-800 text-base md:text-sm group-hover:text-pink-600 transition-colors">
+                                        {{ $product->name }}
+                                    </div>
+                                    @if($product->quantity > 1)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                                            x{{ $product->quantity }}
+                                        </span>
+                                    @endif
                                 </div>
                             </td>
 

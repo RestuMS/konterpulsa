@@ -14,6 +14,7 @@ class Product extends Model
         'price',
         'cost_price',
         'stock',
+        'quantity',
         'image',
         'payment_status',
         'customer_name',

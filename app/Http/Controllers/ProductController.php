@@ -63,6 +63,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'quantity' => 'nullable|integer|min:1',
             'payment_status' => 'required|in:paid,unpaid',
             'customer_name' => 'nullable|string|max:255',
             'created_at' => 'nullable|date',
@@ -70,10 +71,22 @@ class ProductController extends Controller
 
         $data = $request->all();
         
+        // Handle Quantity Logic
+        // If quantity is provided and greater than 1, multiply the unit prices to store TOTALS
+        $quantity = $request->input('quantity', 1); // Default to 1 if not present
+        $data['quantity'] = $quantity;
+
+        // The inputs 'price' and 'cost_price' are considered UNIT prices from the form.
+        // We calculate the total stored value for reports.
+        if ($quantity > 1) {
+            $data['price'] = $request->price * $quantity;
+            $data['cost_price'] = ($request->cost_price ?? 0) * $quantity;
+        }
+
+        // Search Filter (Not relevant here, but keeping context clean)
+        
         // If a custom date is provided, ensure it includes the current time or defaults
         if ($request->has('created_at') && $request->created_at != null) {
-             // Append current time to the date so it's not 00:00:00, or just use the date.
-             // Using simple date from input (Y-m-d) will default to 00:00:00
              $data['created_at'] = $request->created_at . ' ' . now()->format('H:i:s');
         }
 

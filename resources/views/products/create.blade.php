@@ -30,14 +30,27 @@
                         </div>
                     </div>
                     
-                    <!-- Nama Produk -->
-                    <div class="group">
-                        <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Nama Produk</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <!-- Nama Produk & Qty -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="group md:col-span-3">
+                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Nama Produk</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                </div>
+                                <input type="text" name="name" id="name" value="{{ old('name') }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium" placeholder="Contoh: Pulsa 10k" required>
                             </div>
-                            <input type="text" name="name" id="name" value="{{ old('name') }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium" placeholder="Contoh: Pulsa 10k" required>
+                        </div>
+                        
+                        <!-- Quantity -->
+                         <div class="group">
+                            <label for="quantity" class="block text-sm font-semibold text-slate-700 mb-2">Jumlah (Qty)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-400 font-bold text-xs uppercase">x</span>
+                                </div>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" class="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-bold text-center" required>
+                            </div>
                         </div>
                     </div>
 
