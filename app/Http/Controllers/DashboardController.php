@@ -73,6 +73,20 @@ class DashboardController extends Controller
             ];
         }
 
-        return view('dashboard', compact('totalRevenue', 'totalCost', 'totalProfit', 'outOfStockCount', 'totalProducts', 'chartLabels', 'chartDatasets'));
+        // 6. Produk Terlaris (Top 5 Best Selling by Quantity/Count)
+        // Groups products by name, sums their quantity, and orders by total desc.
+        // 6. Produk Terlaris (Top 5 Best Selling by Quantity/Count)
+        // Groups products by name, sums their quantity, and orders by total desc.
+        $topProducts = Product::select(
+                'name', 
+                \Illuminate\Support\Facades\DB::raw('SUM(quantity) as total_qty'), 
+                \Illuminate\Support\Facades\DB::raw('SUM(price - COALESCE(cost_price, 0)) as total_profit')
+            )
+            ->groupBy('name')
+            ->orderByDesc('total_qty')
+            ->take(5)
+            ->get();
+
+        return view('dashboard', compact('totalRevenue', 'totalCost', 'totalProfit', 'outOfStockCount', 'totalProducts', 'chartLabels', 'chartDatasets', 'topProducts'));
     }
 }

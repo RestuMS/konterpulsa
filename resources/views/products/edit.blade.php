@@ -35,6 +35,20 @@
                         </div>
                     </div>
 
+                    <!-- Provider -->
+                    <div class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate-100">
+                        <label class="col-span-4 text-sm font-bold text-slate-700">Provider:</label>
+                        <div class="col-span-8">
+                             <select name="code" class="w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5">
+                                @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends'] as $provider)
+                                    <option value="{{ $provider }}" {{ old('code', $product->code) == $provider ? 'selected' : '' }}>
+                                        {{ $provider }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Harga Beli (Pengeluaran) -->
                     <div class="grid grid-cols-12 gap-4 items-center py-4 border-b border-slate-100">
                         <label for="cost_price" class="col-span-4 text-sm font-bold text-slate-700">Harga Beli:</label>
@@ -98,7 +112,6 @@
                 </div>
 
                 <!-- Hidden / Minimal Fields to prevent errors -->
-                <input type="hidden" name="code" value="{{ $product->code }}">
             </form>
         </div>
     </div>

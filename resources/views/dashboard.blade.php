@@ -90,54 +90,36 @@
         
         <!-- Produk Laris Table -->
         <div class="lg:col-span-2 bg-slate-800 rounded-xl border border-slate-700 shadow-lg p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Produk Laris</h3>
+            <h3 class="text-lg font-bold text-white mb-4">Produk Laris (Top 5)</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-400">
                     <thead class="bg-slate-700/50 text-slate-200 uppercase tracking-wider text-xs">
                         <tr>
                             <th class="p-3 rounded-l-lg">No</th>
-                            <th class="p-3">Tanggal</th>
-                            <th class="p-3">Pelanggan</th>
-                            <th class="p-3">Total</th>
-                            <th class="p-3 rounded-r-lg">Status</th>
+                            <th class="p-3">Nama Produk</th>
+                            <th class="p-3 text-center">Terjual (Qty)</th>
+                            <th class="p-3 rounded-r-lg text-right">Total Laba (Keuntungan)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/50">
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="p-3">001</td>
-                            <td class="p-3">25-04-2024</td>
-                            <td class="p-3 font-semibold text-white">Andi</td>
-                            <td class="p-3">Rp 150.000</td>
-                            <td class="p-3"><span class="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">Sukses</span></td>
-                        </tr>
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="p-3">002</td>
-                            <td class="p-3">25-04-2024</td>
-                            <td class="p-3 font-semibold text-white">Rina</td>
-                            <td class="p-3">Rp 250.000</td>
-                            <td class="p-3"><span class="px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-bold border border-yellow-500/30">Pending</span></td>
-                        </tr>
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="p-3">003</td>
-                            <td class="p-3">25-04-2024</td>
-                            <td class="p-3 font-semibold text-white">Pulsa Telkomsel</td>
-                            <td class="p-3">Rp 100.000</td>
-                            <td class="p-3"><span class="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">Sukses</span></td>
-                        </tr>
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="p-3">004</td>
-                            <td class="p-3">24-04-2024</td>
-                            <td class="p-3 font-semibold text-white">Budi</td>
-                            <td class="p-3">Rp 350.000</td>
-                            <td class="p-3"><span class="px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30">Gagal</span></td>
-                        </tr>
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="p-3">005</td>
-                            <td class="p-3">23-04-2024</td>
-                            <td class="p-3 font-semibold text-white">Susi</td>
-                            <td class="p-3">Rp 200.000</td>
-                            <td class="p-3"><span class="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">Sukses</span></td>
-                        </tr>
+                        @forelse($topProducts as $index => $product)
+                            <tr class="hover:bg-slate-700/20 transition-colors">
+                                <td class="p-3">{{ $index + 1 }}</td>
+                                <td class="p-3 font-semibold text-white">{{ $product->name }}</td>
+                                <td class="p-3 text-center">
+                                    <span class="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
+                                        {{ $product->total_qty }} Item
+                                    </span>
+                                </td>
+                                <td class="p-3 text-right text-emerald-400 font-mono font-bold">
+                                    + Rp {{ number_format($product->total_profit, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="p-6 text-center text-slate-500 italic">Belum ada transaksi</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
