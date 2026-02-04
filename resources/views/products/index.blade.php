@@ -147,149 +147,230 @@
         </div>
     </div>
 
-    <!-- Products Table -->
-    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-white font-bold">
-                        <th class="px-6 py-4 rounded-tl-lg">Tanggal</th>
-                        <th class="px-6 py-4">Provider</th>
-                        <th class="px-6 py-4">Produk</th>
-                        <th class="px-6 py-4">Kategori</th>
-                        <th class="px-6 py-4">Pelanggan</th>
-                        <th class="px-6 py-4 text-right">Modal</th>
-                        <th class="px-6 py-4 text-right">Jual</th>
-                        <th class="px-6 py-4 text-right">Laba</th>
-                        <th class="px-6 py-4 text-center">Status</th>
-                        <th class="px-6 py-4 text-center rounded-tr-lg">Aksi</th>
+    <!-- Products Table (Desktop) -->
+    <div class="hidden md:block bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-900 border-b border-gray-800 text-xs uppercase tracking-widest text-white font-bold">
+                    <th class="px-6 py-4 rounded-tl-lg">Tanggal</th>
+                    <th class="px-6 py-4">Provider</th>
+                    <th class="px-6 py-4">Produk</th>
+                    <th class="px-6 py-4">Kategori</th>
+                    <th class="px-6 py-4">Pelanggan</th>
+                    <th class="px-6 py-4 text-right">Modal</th>
+                    <th class="px-6 py-4 text-right">Jual</th>
+                    <th class="px-6 py-4 text-right">Laba</th>
+                    <th class="px-6 py-4 text-center">Status</th>
+                    <th class="px-6 py-4 text-center rounded-tr-lg">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-600">
+                @forelse($products as $product)
+                    <tr class="group hover:bg-slate-50/80 transition-all duration-200">
+                        <!-- Tanggal -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-bold text-slate-600 block">{{ $product->created_at->format('d M Y') }}</span>
+                        </td>
+
+                        <!-- Provider -->
+                        <td class="px-6 py-4">
+                            <span class="inline-block px-3 py-1 rounded-lg bg-slate-800 text-white font-mono text-xs font-bold tracking-wide shadow-sm">
+                                {{ $product->code }}
+                            </span>
+                        </td>
+                        
+                        <!-- Produk Name -->
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="font-bold text-slate-800 text-base md:text-sm group-hover:text-pink-600 transition-colors">
+                                    {{ $product->name }}
+                                </div>
+                                @if($product->quantity > 1)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                                        x{{ $product->quantity }}
+                                    </span>
+                                @endif
+                            </div>
+                        </td>
+
+                        <!-- Category -->
+                        <td class="px-6 py-4">
+                            @if($product->category)
+                                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-tight">
+                                    {{ $product->category->name }}
+                                </span>
+                            @else
+                                <span class="text-xs text-slate-400 italic">No Category</span>
+                            @endif
+                        </td>
+
+                        <!-- Pelanggan -->
+                        <td class="px-6 py-4">
+                            @if($product->customer_name)
+                                <span class="text-sm font-bold text-slate-700">{{ $product->customer_name }}</span>
+                            @else
+                                <span class="text-slate-400 text-xs">-</span>
+                            @endif
+                        </td>
+
+                        <!-- Modal (Black) -->
+                        <td class="px-6 py-4 text-right">
+                            <span class="text-sm font-bold text-slate-800 font-mono">
+                                {{ number_format($product->cost_price ?? 0, 0, ',', '.') }}
+                            </span>
+                        </td>
+
+                        <!-- Jual (Red) -->
+                        <td class="px-6 py-4 text-right">
+                            <span class="text-sm font-bold text-red-600 font-mono">
+                                {{ number_format($product->price, 0, ',', '.') }}
+                            </span>
+                        </td>
+
+                        <!-- Laba -->
+                        <td class="px-6 py-4 text-right text-emerald-600">
+                            @php
+                                $profit = $product->price - ($product->cost_price ?? 0);
+                            @endphp
+                            <div class="flex items-center justify-end gap-1 font-mono text-sm font-bold bg-emerald-100/50 text-emerald-700 px-2 py-1 rounded-lg inline-block">
+                                <span class="text-xs">+</span> {{ number_format($profit, 0, ',', '.') }}
+                            </div>
+                        </td>
+
+                        <!-- Status -->
+                        <td class="px-6 py-4 text-center">
+                            @if($product->payment_status == 'paid')
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-green-500 text-white shadow-md shadow-green-200">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    LUNAS
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white shadow-md shadow-red-200 animate-pulse">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    KASBON
+                                </span>
+                            @endif
+                        </td>
+
+                        <!-- Aksi -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{{ route('products.edit', $product->id) }}" class="p-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </a>
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-slate-600">
-                    @forelse($products as $product)
-                        <tr class="group hover:bg-slate-50/80 transition-all duration-200">
-                            <!-- Tanggal -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-bold text-slate-600 block">{{ $product->created_at->format('d M Y') }}</span>
-                            </td>
-
-                            <!-- Provider -->
-                            <td class="px-6 py-4">
-                                <span class="inline-block px-3 py-1 rounded-lg bg-slate-800 text-white font-mono text-xs font-bold tracking-wide shadow-sm">
-                                    {{ $product->code }}
-                                </span>
-                            </td>
-                            
-                            <!-- Produk Name -->
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="font-bold text-slate-800 text-base md:text-sm group-hover:text-pink-600 transition-colors">
-                                        {{ $product->name }}
-                                    </div>
-                                    @if($product->quantity > 1)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
-                                            x{{ $product->quantity }}
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-
-                            <!-- Category -->
-                            <td class="px-6 py-4">
-                                @if($product->category)
-                                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-tight">
-                                        {{ $product->category->name }}
-                                    </span>
-                                @else
-                                    <span class="text-xs text-slate-400 italic">No Category</span>
-                                @endif
-                            </td>
-
-                            <!-- Pelanggan -->
-                            <td class="px-6 py-4">
-                                @if($product->customer_name)
-                                    <span class="text-sm font-bold text-slate-700">{{ $product->customer_name }}</span>
-                                @else
-                                    <span class="text-slate-400 text-xs">-</span>
-                                @endif
-                            </td>
-
-                            <!-- Modal (Black) -->
-                            <td class="px-6 py-4 text-right">
-                                <span class="text-sm font-bold text-slate-800 font-mono">
-                                    {{ number_format($product->cost_price ?? 0, 0, ',', '.') }}
-                                </span>
-                            </td>
-
-                            <!-- Jual (Red) -->
-                            <td class="px-6 py-4 text-right">
-                                <span class="text-sm font-bold text-red-600 font-mono">
-                                    {{ number_format($product->price, 0, ',', '.') }}
-                                </span>
-                            </td>
-
-                            <!-- Laba -->
-                            <td class="px-6 py-4 text-right text-emerald-600">
-                                @php
-                                    $profit = $product->price - ($product->cost_price ?? 0);
-                                @endphp
-                                <div class="flex items-center justify-end gap-1 font-mono text-sm font-bold bg-emerald-100/50 text-emerald-700 px-2 py-1 rounded-lg inline-block">
-                                    <span class="text-xs">+</span> {{ number_format($profit, 0, ',', '.') }}
-                                </div>
-                            </td>
-
-                            <!-- Status -->
-                            <td class="px-6 py-4 text-center">
-                                @if($product->payment_status == 'paid')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-green-500 text-white shadow-md shadow-green-200">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                        LUNAS
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white shadow-md shadow-red-200 animate-pulse">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        KASBON
-                                    </span>
-                                @endif
-                            </td>
-
-                            <!-- Aksi -->
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="{{ route('products.edit', $product->id) }}" class="p-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                    </a>
-                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Hapus">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class="p-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-16 h-16 mb-4 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                                    <p class="text-lg font-medium text-slate-500">Belum ada transaksi</p>
-                                    <p class="text-sm">Mulai tambahkan transaksi baru sekarang.</p>
-                                    <a href="{{ route('products.create') }}" class="mt-4 px-4 py-2 bg-pink-50 text-pink-600 font-bold rounded-lg border border-pink-100 hover:bg-pink-100 transition-colors text-sm">
-                                        + Buat Transaksi
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Pagination -->
-        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30">
-            {{ $products->links() }}
-        </div>
+                @empty
+                    <tr>
+                        <td colspan="10" class="p-12 text-center">
+                            <div class="flex flex-col items-center justify-center text-slate-400">
+                                <svg class="w-16 h-16 mb-4 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                <p class="text-lg font-medium text-slate-500">Belum ada transaksi</p>
+                                <p class="text-sm">Mulai tambahkan transaksi baru sekarang.</p>
+                                <a href="{{ route('products.create') }}" class="mt-4 px-4 py-2 bg-pink-50 text-pink-600 font-bold rounded-lg border border-pink-100 hover:bg-pink-100 transition-colors text-sm">
+                                    + Buat Transaksi
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+
+    <!-- Mobile Card View (md and below) -->
+    <div class="md:hidden space-y-4">
+        @forelse($products as $product)
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <!-- Card Header -->
+                <div class="px-4 py-3 bg-slate-50 flex justify-between items-center border-b border-slate-100">
+                    <span class="text-xs font-bold text-slate-500">{{ $product->created_at->format('d M Y') }}</span>
+                    @if($product->payment_status == 'paid')
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">
+                            LUNAS
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 animate-pulse">
+                            KASBON
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-slate-800 text-white font-mono text-[10px] font-bold mb-1">
+                                {{ $product->code }}
+                            </span>
+                            <div class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                {{ $product->name }}
+                                @if($product->quantity > 1)
+                                    <span class="text-xs font-normal text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">x{{ $product->quantity }}</span>
+                                @endif
+                            </div>
+                            @if($product->category)
+                                <span class="text-xs text-slate-500">{{ $product->category->name }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-slate-50 p-2 rounded-lg">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Harga Jual</p>
+                            <p class="font-mono font-bold text-red-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="bg-emerald-50 p-2 rounded-lg">
+                            <p class="text-[10px] text-emerald-600 uppercase font-bold">Laba</p>
+                            @php $profit = $product->price - ($product->cost_price ?? 0); @endphp
+                            <p class="font-mono font-bold text-emerald-700">+ Rp {{ number_format($profit, 0, ',', '.') }}</p>
+                        </div>
+                    </div>
+
+                    @if($product->customer_name)
+                        <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span>{{ $product->customer_name }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Card Footer (Actions) -->
+                <div class="px-4 py-3 bg-gray-50 flex justify-end gap-2 border-t border-slate-100">
+                     <a href="{{ route('products.edit', $product->id) }}" class="px-3 py-1.5 bg-white text-blue-600 border border-blue-200 rounded-lg text-xs font-bold shadow-sm hover:bg-blue-50">
+                        Edit
+                    </a>
+                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-3 py-1.5 bg-white text-red-600 border border-red-200 rounded-lg text-xs font-bold shadow-sm hover:bg-red-50">
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white rounded-xl shadow-sm p-8 text-center border border-slate-100">
+                 <svg class="w-12 h-12 mx-auto mb-3 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <p class="text-slate-500 font-medium">Tidak ada transaksi</p>
+                <a href="{{ route('products.create') }}" class="mt-3 inline-block px-4 py-2 bg-pink-50 text-pink-600 font-bold rounded-lg text-sm">
+                    + Buat Baru
+                </a>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 px-2">
+        {{ $products->links() }}
+    </div>
+
 </x-admin-layout>

@@ -91,7 +91,8 @@
         <!-- Produk Laris Table -->
         <div class="lg:col-span-2 bg-slate-800 rounded-xl border border-slate-700 shadow-lg p-6">
             <h3 class="text-lg font-bold text-white mb-4">Produk Laris (Top 5)</h3>
-            <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-400">
                     <thead class="bg-slate-700/50 text-slate-200 uppercase tracking-wider text-xs">
                         <tr>
@@ -122,6 +123,27 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile List -->
+            <div class="md:hidden space-y-3">
+                @forelse($topProducts as $index => $product)
+                    <div class="bg-slate-700/30 p-4 rounded-lg border border-slate-700">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold text-slate-500">#{{ $index + 1 }}</span>
+                            <span class="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-500/30">
+                                {{ $product->total_qty }} Terjual
+                            </span>
+                        </div>
+                        <h4 class="text-white font-bold mb-1">{{ $product->name }}</h4>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Total Laba</span>
+                            <span class="text-emerald-400 font-mono font-bold">+ Rp {{ number_format($product->total_profit, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-6 text-center text-slate-500 italic">Belum ada transaksi</div>
+                @endforelse
             </div>
         </div>
 
