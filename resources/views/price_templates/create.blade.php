@@ -1,0 +1,148 @@
+<x-admin-layout>
+    <x-slot name="header">
+        {{ __('Tambah Template Harga') }}
+    </x-slot>
+
+    <style>
+        /* Custom Select Dropdown Styling */
+        select option {
+            background-color: #1e293b !important;
+            color: white !important;
+            padding: 12px !important;
+        }
+        select option:hover,
+        select option:checked {
+            background: linear-gradient(to right, #ec4899, #8b5cf6) !important;
+            color: white !important;
+        }
+        
+        /* Custom Number Input Spinner Styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+
+    <div class="max-w-xl mx-auto">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-hidden shadow-2xl shadow-black/30">
+            
+            <!-- Header -->
+            <div class="px-8 pt-8 pb-6">
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Template Harga Baru</h2>
+                        <p class="text-slate-400 text-sm">Atur harga otomatis berdasarkan keyword</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form action="{{ route('price-templates.store') }}" method="POST" class="px-8 pb-8 space-y-5">
+                @csrf
+
+                <!-- Provider -->
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 text-sm font-bold text-white">
+                        <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Provider
+                    </label>
+                    <div class="relative">
+                        <select name="provider" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all appearance-none cursor-pointer">
+                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token'] as $p)
+                                <option value="{{ $p }}" class="bg-slate-800 text-white py-3">{{ $p }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pattern -->
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 text-sm font-bold text-white">
+                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
+                        Keyword / Pattern
+                    </label>
+                    <input type="text" name="pattern" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold placeholder-slate-500 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all" placeholder="Contoh: 3,5 7h" required>
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-700/40 border border-slate-600/50">
+                        <span class="text-xl">💡</span>
+                        <p class="text-sm text-slate-300 leading-relaxed">Pisahkan keyword dengan <span class="text-pink-400 font-bold">spasi</span>. Contoh: <code class="bg-pink-500/20 text-pink-300 px-2 py-1 rounded-lg font-bold">3,5 7h</code> berarti harga akan muncul jika input mengandung "3,5" <span class="text-pink-400 font-bold">DAN</span> "7h".</p>
+                    </div>
+                </div>
+
+                <!-- Harga Grid -->
+                <div class="grid grid-cols-2 gap-5">
+                    <!-- Modal -->
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm font-bold text-white">
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Harga Modal
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="decrementValue('cost_price', 1000)" class="w-12 h-12 rounded-xl bg-red-500/20 border border-red-500/50 text-red-400 font-bold text-xl hover:bg-red-500/30 transition-all flex items-center justify-center">−</button>
+                            <div class="relative flex-1">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-red-400 font-bold">Rp</span>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" id="cost_price" name="cost_price" onkeypress="return onlyNumbers(event)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-900 border-2 border-red-500/50 text-white text-lg font-mono font-bold text-center focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all" placeholder="0" required>
+                            </div>
+                            <button type="button" onclick="incrementValue('cost_price', 1000)" class="w-12 h-12 rounded-xl bg-red-500/20 border border-red-500/50 text-red-400 font-bold text-xl hover:bg-red-500/30 transition-all flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                    <!-- Jual -->
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm font-bold text-white">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Harga Jual
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="decrementValue('price', 1000)" class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-bold text-xl hover:bg-emerald-500/30 transition-all flex items-center justify-center">−</button>
+                            <div class="relative flex-1">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">Rp</span>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" id="price" name="price" onkeypress="return onlyNumbers(event)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-900 border-2 border-emerald-500/50 text-white text-lg font-mono font-bold text-center focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all" placeholder="0" required>
+                            </div>
+                            <button type="button" onclick="incrementValue('price', 1000)" class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-bold text-xl hover:bg-emerald-500/30 transition-all flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    // Only allow number keys
+                    function onlyNumbers(e) {
+                        const charCode = e.which ? e.which : e.keyCode;
+                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                            return false;
+                        }
+                        return true;
+                    }
+                    
+                    function incrementValue(id, step) {
+                        const input = document.getElementById(id);
+                        input.value = parseInt(input.value || 0) + step;
+                    }
+                    function decrementValue(id, step) {
+                        const input = document.getElementById(id);
+                        const newValue = parseInt(input.value || 0) - step;
+                        input.value = newValue >= 0 ? newValue : 0;
+                    }
+                </script>
+
+                <!-- Actions -->
+                <div class="pt-6 flex justify-end gap-4">
+                    <a href="{{ route('price-templates.index') }}" class="px-6 py-3.5 rounded-xl border-2 border-slate-500 text-slate-300 font-bold hover:bg-slate-700 hover:text-white hover:border-slate-400 transition-all">
+                        Batal
+                    </a>
+                    <button type="submit" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-lg hover:from-pink-600 hover:to-purple-700 shadow-xl shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:scale-[1.02] transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Simpan Template
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-admin-layout>

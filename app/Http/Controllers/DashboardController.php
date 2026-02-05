@@ -11,11 +11,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Total Penjualan (Omset)
-        $totalRevenue = Product::sum('price'); 
+        // 1. Total Penjualan (Omset) - Bulan Ini
+        $totalRevenue = Product::whereMonth('created_at', now()->month)
+                               ->whereYear('created_at', now()->year)
+                               ->sum('price'); 
         
-        // 2. Total Modal (Pengeluaran)
-        $totalCost = Product::sum('cost_price');
+        // 2. Total Modal (Pengeluaran) - Bulan Ini
+        $totalCost = Product::whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->sum('cost_price');
 
         // 3. Laba (Selisih)
         $totalProfit = $totalRevenue - $totalCost;

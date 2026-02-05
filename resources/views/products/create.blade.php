@@ -86,7 +86,7 @@
                                 </div>
                                 <select name="code" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium appearance-none cursor-pointer">
                                     <option value="" disabled selected>Pilih Provider</option>
-                                    @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends'] as $provider)
+                                    @foreach(['Telkomsel', 'By.U', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends'] as $provider)
                                         <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
                                     @endforeach
                                 </select>
@@ -106,7 +106,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-red-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="number" name="cost_price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="number" name="cost_price" id="cost_price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold" required>
                             </div>
                         </div>
 
@@ -117,7 +117,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-green-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="number" name="price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="number" name="price" id="price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold" required>
                             </div>
                         </div>
                     </div>
@@ -192,3 +192,120 @@
         </div>
     </div>
 </x-admin-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const nameInput = document.getElementById('name');
+        const costInput = document.getElementById('cost_price');
+        const priceInput = document.getElementById('price');
+        const providerSelect = document.querySelector('select[name="code"]');
+        const categorySelect = document.querySelector('select[name="category_id"]');
+
+        // 1. Inisialisasi Database Struktur
+        const pricingDatabase = {
+            'telkomsel': { patterns: ['tsel', 'telkomsel', 'simpati', 'as'], products: [] },
+            'three':     { patterns: ['tri', 'three', '3 '], products: [] },
+            'indosat':   { patterns: ['indosat', 'isat', 'im3'], products: [] },
+            'xl':        { patterns: ['xl'], products: [] },
+            'axis':      { patterns: ['axis'], products: [] },
+            'smartfren': { patterns: ['smartfren'], products: [] },
+            'byu':       { patterns: ['byu', 'by.u'], products: [] },
+            'dana':      { patterns: ['dana'], products: [] },
+            'gopay':     { patterns: ['gopay'], products: [] },
+            'shopeepay': { patterns: ['shopee', 'shopeepay'], products: [] },
+            'token':     { patterns: ['token', 'pln'], products: [] },
+        };
+
+        // 2. Load Data dari Database (Dynamic)
+        const dbTemplates = @json($priceTemplates ?? []);
+
+        dbTemplates.forEach(template => {
+            // Mapping Provider Name dari DB ke Key pricingDatabase
+            let key = null;
+            const p = template.provider.toLowerCase();
+            
+            if (p === 'three') key = 'three';
+            else if (p === 'by.u') key = 'byu';
+            else if (pricingDatabase[p]) key = p;
+            
+            if (key && pricingDatabase[key]) {
+                // Split pattern database (misal "1,5 3h") menjadi array keyword ['1,5', '3h']
+                // Jika user input pake spasi di DB, kita split. Jika tidak, jadi 1 item array.
+                const keywords = template.pattern.toLowerCase().split(' ').map(k => k.trim());
+                
+                pricingDatabase[key].products.push({
+                    check: keywords,
+                    cost: parseFloat(template.cost_price),
+                    price: parseFloat(template.price)
+                });
+            }
+        });
+
+        // 3. Logic Event Input
+        nameInput.addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            
+            // A. Deteksi Provider
+            let foundProviderKey = null;
+            
+            for (const [key, data] of Object.entries(pricingDatabase)) {
+                if (data.patterns.some(pattern => text.includes(pattern))) {
+                    foundProviderKey = key;
+                    
+                    // Auto-select Provider di Dropdown
+                    const providerMap = {
+                        'three': 'Three',
+                        'telkomsel': 'Telkomsel', 
+                        'xl': 'XL',
+                        'indosat': 'Indosat',
+                        'axis': 'Axis',
+                        'smartfren': 'Smartfren',
+                        'byu': 'By.U',
+                        'dana': 'Dana',
+                        'gopay': 'Gopay',
+                        'shopeepay': 'ShopeePay',
+                        'token': 'Token',
+                    };
+                    
+                    if (providerMap[key]) {
+                        for(let i=0; i<providerSelect.options.length; i++) {
+                            if(providerSelect.options[i].value === providerMap[key]) {
+                                providerSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                    break; 
+                }
+            }
+
+            // B. Deteksi Harga Berdasarkan Keyword Produk
+            if (foundProviderKey) {
+                const products = pricingDatabase[foundProviderKey].products;
+                let matchedProduct = null;
+                
+                // Cari produk yang cocok
+                // Kita cari yang match terbanyak atau exact match
+                // Sort by jumlah keyword match (descending) biar yang paling spesifik menang
+                products.sort((a, b) => b.check.length - a.check.length);
+
+                for (const product of products) {
+                    const allKeywordsMatch = product.check.every(keyword => text.includes(keyword));
+                    if (allKeywordsMatch) {
+                        matchedProduct = product;
+                        break; 
+                    }
+                }
+
+                if (matchedProduct) {
+                    costInput.value = matchedProduct.cost;
+                    priceInput.value = matchedProduct.price;
+                    
+                    // Visual feedback
+                    costInput.classList.add('bg-green-50', 'text-green-700');
+                    setTimeout(() => costInput.classList.remove('bg-green-50', 'text-green-700'), 500);
+                }
+            }
+        });
+    });
+</script>

@@ -28,7 +28,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Common Routes
     Route::resource('products', ProductController::class);
-    Route::get('/transactions/unpaid', [TransactionController::class, 'unpaid'])->name('transactions.unpaid'); // New Kasbon Route
+    Route::resource('price-templates', App\Http\Controllers\PriceTemplateController::class);
+    Route::get('/transactions/unpaid', [TransactionController::class, 'unpaid'])->name('transactions.unpaid'); 
     Route::resource('transactions', TransactionController::class);
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/print', [ReportController::class, 'print'])->name('reports.print');
@@ -40,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Group khusus ROLE KASIR
     Route::middleware('role:kasir')->group(function () {
-        Route::resource('expenses', ExpenseController::class);
+        // Route::resource('expenses', ExpenseController::class); // Jika diperlukan
     });
 });
 

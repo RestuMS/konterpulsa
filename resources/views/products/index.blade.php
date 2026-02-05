@@ -169,7 +169,7 @@
                     <tr class="group hover:bg-slate-50/80 transition-all duration-200">
                         <!-- Tanggal -->
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-bold text-slate-600 block">{{ $product->created_at->format('d M Y') }}</span>
+                            <span class="text-sm font-bold text-slate-600 block">{{ optional($product->created_at)->format('d M Y') ?? '-' }}</span>
                         </td>
 
                         <!-- Provider -->
@@ -292,7 +292,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                 <!-- Card Header -->
                 <div class="px-4 py-3 bg-slate-50 flex justify-between items-center border-b border-slate-100">
-                    <span class="text-xs font-bold text-slate-500">{{ $product->created_at->format('d M Y') }}</span>
+                    <span class="text-xs font-bold text-slate-500">{{ optional($product->created_at)->format('d M Y') ?? '-' }}</span>
                     @if($product->payment_status == 'paid')
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">
                             LUNAS

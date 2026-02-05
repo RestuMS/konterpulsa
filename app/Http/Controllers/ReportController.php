@@ -91,7 +91,7 @@ class ReportController extends Controller
         // Logic for Top 3 Best Selling Products
         $topProducts = Product::whereMonth('created_at', $month)
                             ->whereYear('created_at', $year)
-                            ->select('name', \Illuminate\Support\Facades\DB::raw('count(*) as total_sold'))
+                            ->select('name', \Illuminate\Support\Facades\DB::raw('sum(quantity) as total_sold'))
                             ->groupBy('name')
                             ->orderByDesc('total_sold')
                             ->take(3)
