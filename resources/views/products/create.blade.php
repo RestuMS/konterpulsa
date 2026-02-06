@@ -106,7 +106,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-red-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="number" name="cost_price" id="cost_price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="text" name="cost_price" id="cost_price" value="" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold" required>
                             </div>
                         </div>
 
@@ -117,7 +117,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-green-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="number" name="price" id="price" value="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="text" name="price" id="price" value="" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold" required>
                             </div>
                         </div>
                     </div>
@@ -229,8 +229,6 @@
             else if (pricingDatabase[p]) key = p;
             
             if (key && pricingDatabase[key]) {
-                // Split pattern database (misal "1,5 3h") menjadi array keyword ['1,5', '3h']
-                // Jika user input pake spasi di DB, kita split. Jika tidak, jadi 1 item array.
                 const keywords = template.pattern.toLowerCase().split(' ').map(k => k.trim());
                 
                 pricingDatabase[key].products.push({
@@ -241,7 +239,58 @@
             }
         });
 
-        // 3. Logic Event Input
+        // Helper Functions for Rupiah Formatting
+        function formatRupiah(angka) {
+            if (!angka) return '';
+            
+            // Ensure input is a string
+            let number_string = angka.toString().replace(/[^,\d]/g, '');
+            
+            // Remove leading zeros by parsing to int then back to string, unless it's just "0" or empty
+            if (number_string === '') return '';
+            
+            // Parse integer to remove leading zeros (e.g., "05" -> 5)
+            // But be careful if user is typing "0" intentionally as first char of nothing? 
+            // Actually standard behavior: typing 5 when value is empty -> 5. 
+            // If placeholder is 0, value is empty.
+            
+            let value = parseInt(number_string);
+            if (isNaN(value)) return '';
+            
+            number_string = value.toString();
+            
+            let split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return rupiah;
+        }
+
+        function cleanRupiah(angka) {
+            return angka.replace(/\./g, '');
+        }
+
+        // Apply formatting logic to inputs
+        [costInput, priceInput].forEach(input => {
+            input.addEventListener('input', function(e) {
+                e.target.value = formatRupiah(e.target.value);
+            });
+            
+            // Handle focus: if empty, keep empty (placeholder '0' handles visual).
+            // Logic "tidak perlu menghapus angka 0" is handled by the fact that
+            // we removed value="0" and used placeholder="0".
+            // If we had value="0", we would need to clear it on focus or intelligent formatting.
+            // With placeholder, the user just types "5" and it becomes "5".
+        });
+
+        // 3. Logic Event Input (Product Name)
         nameInput.addEventListener('input', (e) => {
             const text = e.target.value.toLowerCase();
             
@@ -284,9 +333,6 @@
                 const products = pricingDatabase[foundProviderKey].products;
                 let matchedProduct = null;
                 
-                // Cari produk yang cocok
-                // Kita cari yang match terbanyak atau exact match
-                // Sort by jumlah keyword match (descending) biar yang paling spesifik menang
                 products.sort((a, b) => b.check.length - a.check.length);
 
                 for (const product of products) {
@@ -298,14 +344,23 @@
                 }
 
                 if (matchedProduct) {
-                    costInput.value = matchedProduct.cost;
-                    priceInput.value = matchedProduct.price;
+                    // Update values with formatting
+                    costInput.value = formatRupiah(matchedProduct.cost);
+                    priceInput.value = formatRupiah(matchedProduct.price);
                     
                     // Visual feedback
                     costInput.classList.add('bg-green-50', 'text-green-700');
                     setTimeout(() => costInput.classList.remove('bg-green-50', 'text-green-700'), 500);
                 }
             }
+        });
+
+        // 4. Clean inputs on submit
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            [costInput, priceInput].forEach(input => {
+                input.value = cleanRupiah(input.value);
+            });
         });
     });
 </script>

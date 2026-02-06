@@ -56,7 +56,7 @@
                         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-black uppercase tracking-wider text-slate-900 leading-none">Konter Pos</h1>
+                        <h1 class="text-3xl font-black uppercase tracking-wider text-slate-900 leading-none">Restu Cell</h1>
                         <p class="text-sm text-slate-500 font-bold tracking-[0.2em] uppercase mt-1.5">Management System</p>
                     </div>
                 </div>

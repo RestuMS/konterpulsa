@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'KonterPOS') }}</title>
+        <title>{{ config('app.name', 'Restu Cell') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
                     </div>
                 </a>
                 
-                <h1 class="text-3xl font-bold mb-2 text-white drop-shadow-md">Konter POS</h1>
+                <h1 class="text-3xl font-bold mb-2 text-white drop-shadow-md">Restu Cell</h1>
                 <p class="text-white/60 mb-8 font-light tracking-wide">Premium Point of Sale System</p>
             </div>
 

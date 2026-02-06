@@ -49,11 +49,12 @@
                         </div>
                     </div>
 
+
                     <!-- Harga Beli (Pengeluaran) -->
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4 py-4 border-b border-slate-100">
                         <label for="cost_price" class="md:col-span-4 text-sm font-bold text-slate-700">Harga Beli:</label>
                         <div class="md:col-span-8">
-                            <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price', $product->cost_price) }}" class="w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5" required>
+                            <input type="text" name="cost_price" id="cost_price" value="{{ old('cost_price', number_format($product->cost_price, 0, ',', '')) }}" class="rupiah-input w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5" required>
                         </div>
                     </div>
 
@@ -61,7 +62,7 @@
                     <div class="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4 py-4 border-b border-slate-100">
                         <label for="price" class="md:col-span-4 text-sm font-bold text-slate-700">Harga Jual:</label>
                         <div class="md:col-span-8">
-                            <input type="number" name="price" id="price" value="{{ old('price', $product->price) }}" class="w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5" required>
+                            <input type="text" name="price" id="price" value="{{ old('price', number_format($product->price, 0, ',', '')) }}" class="rupiah-input w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5" required>
                         </div>
                     </div>
 
@@ -93,7 +94,7 @@
                             
                             <!-- Toggle / Select -->
                             <select onchange="document.getElementById('real_stock').value = this.value === 'available' ? 100 : 0" 
-                                    class="w-full md:w-auto bg-green-100 text-green-700 font-bold border-none rounded px-4 py-1.5 text-sm cursor-pointer focus:ring-0">
+                                    class="w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5">
                                 <option value="available" {{ $product->stock > 0 ? 'selected' : '' }}>Tersedia</option>
                                 <option value="empty" {{ $product->stock == 0 ? 'selected' : '' }}>Habis</option>
                             </select>
@@ -110,6 +111,50 @@
                         Batal
                     </a>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const inputs = document.querySelectorAll('.rupiah-input');
+                        
+                        function formatRupiah(angka) {
+                            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                            split   = number_string.split(','),
+                            sisa    = split[0].length % 3,
+                            rupiah  = split[0].substr(0, sisa),
+                            ribuan  = split[0].substr(sisa).match(/\d{3}/gi);
+                
+                            if(ribuan){
+                                separator = sisa ? '.' : '';
+                                rupiah += separator + ribuan.join('.');
+                            }
+                
+                            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                            return rupiah;
+                        }
+
+                        function cleanRupiah(angka) {
+                            return angka.replace(/\./g, '');
+                        }
+
+                        inputs.forEach(input => {
+                            // Initial format
+                            if(input.value) {
+                                input.value = formatRupiah(input.value);
+                            }
+
+                            input.addEventListener('input', function(e) {
+                                e.target.value = formatRupiah(e.target.value);
+                            });
+                        });
+
+                        const form = document.querySelector('form');
+                        form.addEventListener('submit', function() {
+                            inputs.forEach(input => {
+                                input.value = cleanRupiah(input.value);
+                            });
+                        });
+                    });
+                </script>
 
                 <!-- Hidden / Minimal Fields to prevent errors -->
             </form>

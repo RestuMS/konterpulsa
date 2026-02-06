@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="mb-6 flex justify-between items-center">
-        <p class="text-gray-500">Manage your store KonterPos.</p>
+        <p class="text-gray-500">Manage your store Restu Cell.</p>
         <a href="{{ route('products.create') }}" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105">
             + Tambah Transaksi
         </a>
