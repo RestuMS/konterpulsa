@@ -14,10 +14,29 @@
             </div>
 
             <!-- Form -->
-            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
+            <form id="productForm" action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
                 @csrf
 
                 <div class="space-y-6">
+
+                    <!-- Global Error Summary -->
+                    @if ($errors->any())
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Terdapat kesalahan pada input:</h3>
+                                    <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Tanggal Transaksi (Optional) -->
                     <div class="group">
@@ -38,7 +57,8 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                 </div>
-                                <input type="text" name="name" id="name" value="{{ old('name') }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium" placeholder="Contoh: Pulsa 10k" required>
+                                <input type="text" name="name" id="name" value="{{ old('name') }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium @error('name') border-red-500 ring-1 ring-red-500 @enderror" placeholder="Contoh: Pulsa 10k" required>
+                                @error('name') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         
@@ -63,10 +83,10 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-white z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                                 </div>
-                                <select name="category_id" class="w-full pl-10 pr-10 py-3 bg-blue-600 border border-blue-600 text-white rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-700 transition-all font-semibold appearance-none cursor-pointer hover:bg-blue-700">
+                                <select name="category_id" id="category_id" class="w-full pl-10 pr-10 py-3 bg-blue-600 border border-blue-600 text-white rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-700 transition-all font-semibold appearance-none cursor-pointer hover:bg-blue-700 @error('category_id') border-red-500 ring-1 ring-red-500 @enderror">
                                     <option value="" disabled selected class="text-slate-500 bg-white">Pilih Kategori</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }} class="bg-white text-slate-800">
+                                        <option value="{{ $category->id }}" data-name="{{ $category->name }}" {{ old('category_id') == $category->id ? 'selected' : '' }} class="bg-white text-slate-800">
                                             {{ $category->name }}
                                         </option>
                                     @endforeach
@@ -75,18 +95,19 @@
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                            @error('category_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Kode Provider -->
                         <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Provider</label>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Operator</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 </div>
-                                <select name="code" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Pilih Provider</option>
-                                    @foreach(['Telkomsel', 'By.U', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends'] as $provider)
+                                <select name="code" id="provider_code" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium appearance-none cursor-pointer @error('code') border-red-500 ring-1 ring-red-500 @enderror">
+                                    <option value="" disabled selected>Pilih Operator</option>
+                                    @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
                                         <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
                                     @endforeach
                                 </select>
@@ -94,6 +115,7 @@
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                            @error('code') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
@@ -106,7 +128,8 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-red-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="text" name="cost_price" id="cost_price" value="" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="text" name="cost_price" id="cost_price" value="{{ old('cost_price') }}" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold @error('cost_price') border-red-500 ring-1 ring-red-500 @enderror" required>
+                                @error('cost_price') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
@@ -117,7 +140,8 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-slate-400 font-bold group-focus-within:text-green-500 transition-colors">Rp</span>
                                 </div>
-                                <input type="text" name="price" id="price" value="" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold" required>
+                                <input type="text" name="price" id="price" value="{{ old('price') }}" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold @error('price') border-red-500 ring-1 ring-red-500 @enderror" required>
+                                @error('price') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>
@@ -198,169 +222,145 @@
         const nameInput = document.getElementById('name');
         const costInput = document.getElementById('cost_price');
         const priceInput = document.getElementById('price');
-        const providerSelect = document.querySelector('select[name="code"]');
-        const categorySelect = document.querySelector('select[name="category_id"]');
+        const providerSelect = document.getElementById('provider_code');
+        const categorySelect = document.getElementById('category_id');
 
-        // 1. Inisialisasi Database Struktur
-        const pricingDatabase = {
-            'telkomsel': { patterns: ['tsel', 'telkomsel', 'simpati', 'as'], products: [] },
-            'three':     { patterns: ['tri', 'three', '3 '], products: [] },
-            'indosat':   { patterns: ['indosat', 'isat', 'im3'], products: [] },
-            'xl':        { patterns: ['xl'], products: [] },
-            'axis':      { patterns: ['axis'], products: [] },
-            'smartfren': { patterns: ['smartfren'], products: [] },
-            'byu':       { patterns: ['byu', 'by.u'], products: [] },
-            'dana':      { patterns: ['dana'], products: [] },
-            'gopay':     { patterns: ['gopay'], products: [] },
-            'shopeepay': { patterns: ['shopee', 'shopeepay'], products: [] },
-            'token':     { patterns: ['token', 'pln'], products: [] },
-        };
-
-        // 2. Load Data dari Database (Dynamic)
+        // Load Templates from Database
         const dbTemplates = @json($priceTemplates ?? []);
-
-        dbTemplates.forEach(template => {
-            // Mapping Provider Name dari DB ke Key pricingDatabase
-            let key = null;
-            const p = template.provider.toLowerCase();
-            
-            if (p === 'three') key = 'three';
-            else if (p === 'by.u') key = 'byu';
-            else if (pricingDatabase[p]) key = p;
-            
-            if (key && pricingDatabase[key]) {
-                const keywords = template.pattern.toLowerCase().split(' ').map(k => k.trim());
-                
-                pricingDatabase[key].products.push({
-                    check: keywords,
-                    cost: parseFloat(template.cost_price),
-                    price: parseFloat(template.price)
-                });
-            }
-        });
 
         // Helper Functions for Rupiah Formatting
         function formatRupiah(angka) {
             if (!angka) return '';
-            
-            // Ensure input is a string
             let number_string = angka.toString().replace(/[^,\d]/g, '');
-            
-            // Remove leading zeros by parsing to int then back to string, unless it's just "0" or empty
             if (number_string === '') return '';
-            
-            // Parse integer to remove leading zeros (e.g., "05" -> 5)
-            // But be careful if user is typing "0" intentionally as first char of nothing? 
-            // Actually standard behavior: typing 5 when value is empty -> 5. 
-            // If placeholder is 0, value is empty.
-            
             let value = parseInt(number_string);
             if (isNaN(value)) return '';
-            
             number_string = value.toString();
-            
             let split = number_string.split(','),
                 sisa = split[0].length % 3,
                 rupiah = split[0].substr(0, sisa),
                 ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
             if (ribuan) {
                 separator = sisa ? '.' : '';
                 rupiah += separator + ribuan.join('.');
             }
-
             rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
             return rupiah;
         }
 
-        function cleanRupiah(angka) {
-            return angka.replace(/\./g, '');
-        }
-
-        // Apply formatting logic to inputs
         [costInput, priceInput].forEach(input => {
             input.addEventListener('input', function(e) {
                 e.target.value = formatRupiah(e.target.value);
             });
-            
-            // Handle focus: if empty, keep empty (placeholder '0' handles visual).
-            // Logic "tidak perlu menghapus angka 0" is handled by the fact that
-            // we removed value="0" and used placeholder="0".
-            // If we had value="0", we would need to clear it on focus or intelligent formatting.
-            // With placeholder, the user just types "5" and it becomes "5".
         });
 
-        // 3. Logic Event Input (Product Name)
-        nameInput.addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase();
+        // --- Logic Pencarian Harga & Category Otomatis ---
+        function checkAndApplyTemplate() {
+            const currentName = nameInput.value.toLowerCase();
+            if (!currentName) return;
+
+            const currentProvider = providerSelect.value;
+            // Note: We prioritize finding a match even if category is not selected yet
             
-            // A. Deteksi Provider
-            let foundProviderKey = null;
-            
-            for (const [key, data] of Object.entries(pricingDatabase)) {
-                if (data.patterns.some(pattern => text.includes(pattern))) {
-                    foundProviderKey = key;
-                    
-                    // Auto-select Provider di Dropdown
-                    const providerMap = {
-                        'three': 'Three',
-                        'telkomsel': 'Telkomsel', 
-                        'xl': 'XL',
-                        'indosat': 'Indosat',
-                        'axis': 'Axis',
-                        'smartfren': 'Smartfren',
-                        'byu': 'By.U',
-                        'dana': 'Dana',
-                        'gopay': 'Gopay',
-                        'shopeepay': 'ShopeePay',
-                        'token': 'Token',
-                    };
-                    
-                    if (providerMap[key]) {
+            // Filter templates that match the selected provider (if selected)
+            // If provider is not selected, we look through all, but usually provider is auto-detected first
+            let relevantTemplates = dbTemplates;
+            if (currentProvider) {
+                relevantTemplates = dbTemplates.filter(t => t.provider === currentProvider);
+            }
+
+            // Find matching product pattern
+            const matchedTemplate = relevantTemplates.find(template => {
+                const keywords = template.pattern.toLowerCase().split(' ').map(k => k.trim());
+                return keywords.every(keyword => currentName.includes(keyword));
+            });
+
+            if (matchedTemplate) {
+                console.log("Template found:", matchedTemplate);
+
+                // 1. Auto-set Category if it matches the template's category
+                for(let i=0; i<categorySelect.options.length; i++) {
+                     if(categorySelect.options[i].getAttribute('data-name') === matchedTemplate.category) {
+                         categorySelect.selectedIndex = i;
+                         break;
+                     }
+                }
+
+                // 2. Set Prices
+                costInput.value = formatRupiah(parseInt(matchedTemplate.cost_price));
+                priceInput.value = formatRupiah(parseInt(matchedTemplate.price));
+
+                // Visual Feedback
+                costInput.classList.add('bg-green-50', 'text-green-700');
+                priceInput.classList.add('bg-green-50', 'text-green-700');
+                
+                setTimeout(() => {
+                    costInput.classList.remove('bg-green-50', 'text-green-700');
+                    priceInput.classList.remove('bg-green-50', 'text-green-700');
+                }, 1000);
+            } else {
+                // If no template match, use legacy keyword fallback for category (only if empty)
+                if (categorySelect.value === "") {
+                    autoDetectCategoryFallback(currentName);
+                }
+            }
+        }
+
+        // --- Logic Auto-Detect Provider ---
+        function autoDetectProvider(text) {
+             if (providerSelect.value === "") {
+                const providerMap = {
+                    'tree': 'Three', 'tri': 'Three', '3 ': 'Three',
+                    'telkomsel': 'Telkomsel', 'tsel': 'Telkomsel', 'simpati': 'Telkomsel', 'as ': 'Telkomsel',
+                    'xl': 'XL', 'axis': 'Axis', 'smartfren': 'Smartfren', 'by.u': 'By.U', 'byu': 'By.U',
+                    'dana': 'Dana', 'gopay': 'Gopay', 'shopeepay': 'ShopeePay', 
+                    'token': 'Token', 
+                    'listrik': 'Listrik', 'pln': 'Listrik'
+                };
+                
+                for (const [key, val] of Object.entries(providerMap)) {
+                    if (text.includes(key)) {
                         for(let i=0; i<providerSelect.options.length; i++) {
-                            if(providerSelect.options[i].value === providerMap[key]) {
+                            if(providerSelect.options[i].value === val) {
                                 providerSelect.selectedIndex = i;
                                 break;
                             }
                         }
-                    }
-                    break; 
-                }
-            }
-
-            // B. Deteksi Harga Berdasarkan Keyword Produk
-            if (foundProviderKey) {
-                const products = pricingDatabase[foundProviderKey].products;
-                let matchedProduct = null;
-                
-                products.sort((a, b) => b.check.length - a.check.length);
-
-                for (const product of products) {
-                    const allKeywordsMatch = product.check.every(keyword => text.includes(keyword));
-                    if (allKeywordsMatch) {
-                        matchedProduct = product;
-                        break; 
+                        break;
                     }
                 }
+            }
+        }
 
-                if (matchedProduct) {
-                    // Update values with formatting
-                    costInput.value = formatRupiah(matchedProduct.cost);
-                    priceInput.value = formatRupiah(matchedProduct.price);
-                    
-                    // Visual feedback
-                    costInput.classList.add('bg-green-50', 'text-green-700');
-                    setTimeout(() => costInput.classList.remove('bg-green-50', 'text-green-700'), 500);
+        function autoDetectCategoryFallback(text) {
+            let detectedCategoryName = null;
+            if (['dana', 'gopay', 'shopeepay', 'ovo', 'linkaja', 'wallet'].some(k => text.includes(k))) detectedCategoryName = 'E-Wallet';
+            else if (['token', 'pln', 'listrik'].some(k => text.includes(k))) detectedCategoryName = 'Listrik';
+            else if (text.includes('voucher') || text.includes('vc') || text.includes('fisik')) detectedCategoryName = 'Voucher';
+            else if (text.includes('data') || text.includes('gb') || text.includes('quota') || text.includes('kuota') || text.includes('freedom') || text.includes('unlimited')) detectedCategoryName = 'Paket Data';
+            else if (text.includes('pulsa') || text.includes('isi ulang')) detectedCategoryName = 'Pulsa';
+            else if (['ff', 'free fire', 'ml', 'mobile legends', 'game', 'top up'].some(k => text.includes(k))) detectedCategoryName = 'Top Up Game'; // Sesuaikan name di DB
+            
+            if (detectedCategoryName) {
+                for(let i=0; i<categorySelect.options.length; i++) {
+                        if(categorySelect.options[i].getAttribute('data-name') === detectedCategoryName) {
+                            categorySelect.selectedIndex = i;
+                            break;
+                        }
                 }
             }
+        }
+
+        // Attach Listeners
+        nameInput.addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            autoDetectProvider(text); 
+            checkAndApplyTemplate(); 
         });
 
-        // 4. Clean inputs on submit
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function() {
-            [costInput, priceInput].forEach(input => {
-                input.value = cleanRupiah(input.value);
-            });
-        });
+        providerSelect.addEventListener('change', checkAndApplyTemplate);
+        // We still check template on category change, though usually name+provider drives it
+        categorySelect.addEventListener('change', checkAndApplyTemplate);
+
     });
 </script>

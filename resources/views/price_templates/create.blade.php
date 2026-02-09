@@ -46,15 +46,15 @@
             <form action="{{ route('price-templates.store') }}" method="POST" class="px-8 pb-8 space-y-5">
                 @csrf
 
-                <!-- Provider -->
+                <!-- Operator -->
                 <div class="space-y-2">
                     <label class="flex items-center gap-2 text-sm font-bold text-white">
                         <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Provider
+                        Operator
                     </label>
                     <div class="relative">
                         <select name="provider" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all appearance-none cursor-pointer">
-                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token'] as $p)
+                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
                                 <option value="{{ $p }}" class="bg-slate-800 text-white py-3">{{ $p }}</option>
                             @endforeach
                         </select>
@@ -64,13 +64,31 @@
                     </div>
                 </div>
 
-                <!-- Pattern -->
+                <!-- Kategori -->
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 text-sm font-bold text-white">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        Kategori
+                    </label>
+                    <div class="relative">
+                        <select name="category" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                            @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
+                                <option value="{{ $c }}" class="bg-slate-800 text-white py-3">{{ $c }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nama Produk -->
                 <div class="space-y-2">
                     <label class="flex items-center gap-2 text-sm font-bold text-white">
                         <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
-                        Keyword / Pattern
+                        Nama Produk
                     </label>
-                    <input type="text" name="pattern" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold placeholder-slate-500 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all" placeholder="Contoh: 3,5 7h" required>
+                    <input type="text" name="pattern" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold placeholder-slate-500 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all" placeholder="Contoh: 10k, 20k, 50k" required>
                     <div class="flex items-start gap-3 p-4 rounded-xl bg-slate-700/40 border border-slate-600/50">
                         <span class="text-xl">💡</span>
                         <p class="text-sm text-slate-300 leading-relaxed">Pisahkan keyword dengan <span class="text-pink-400 font-bold">spasi</span>. Contoh: <code class="bg-pink-500/20 text-pink-300 px-2 py-1 rounded-lg font-bold">3,5 7h</code> berarti harga akan muncul jika input mengandung "3,5" <span class="text-pink-400 font-bold">DAN</span> "7h".</p>

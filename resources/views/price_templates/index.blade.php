@@ -26,8 +26,9 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-slate-700/30 border-b border-slate-700/50 text-xs uppercase tracking-widest text-slate-400 font-bold">
-                        <th class="px-6 py-4">Provider</th>
-                        <th class="px-6 py-4">Keyword (Pattern)</th>
+                        <th class="px-6 py-4">Operator</th>
+                        <th class="px-6 py-4">Kategori</th>
+                        <th class="px-6 py-4">Nama Produk</th>
                         <th class="px-6 py-4 text-right">Harga Modal</th>
                         <th class="px-6 py-4 text-right">Harga Jual</th>
                         <th class="px-6 py-4 text-center">Aksi</th>
@@ -37,6 +38,9 @@
                     @forelse($templates as $template)
                         <tr class="hover:bg-slate-700/30 transition-colors text-slate-300">
                             <td class="px-6 py-4 font-bold text-white">{{ $template->provider }}</td>
+                            <td class="px-6 py-4">
+                                <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-lg font-bold text-xs uppercase">{{ $template->category }}</span>
+                            </td>
                             <td class="px-6 py-4">
                                 <span class="font-mono bg-pink-500/20 text-pink-400 px-3 py-1 rounded-lg font-bold text-sm">{{ $template->pattern }}</span>
                             </td>
@@ -55,7 +59,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-10 text-center text-slate-500">
+                            <td colspan="6" class="p-10 text-center text-slate-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Belum ada template harga. Klik "Tambah Template" untuk memulai.
                             </td>

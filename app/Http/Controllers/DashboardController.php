@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $outOfStockCount = Product::where('stock', '<=', 0)->count();
 
         // 5. Total Item Produk
-        $totalProducts = Product::count();
+        $totalProducts = Product::sum('quantity');
 
         // --- Chart Logic (Same as ReportController) ---
         $month = now()->month;

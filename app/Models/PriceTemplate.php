@@ -11,6 +11,7 @@ class PriceTemplate extends Model
 
     protected $fillable = [
         'provider',
+        'category',
         'pattern',
         'cost_price',
         'price',

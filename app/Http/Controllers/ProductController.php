@@ -37,7 +37,7 @@ class ProductController extends Controller
         $totalProfit = $totalRevenue - $totalCost;
 
         $products = $query->paginate(10);
-        $totalProducts = $products->total(); // Use total from paginator
+        $totalProducts = $totalsQuery->sum('quantity');
 
         return view('products.index', compact('products', 'totalCost', 'totalRevenue', 'totalProfit', 'totalProducts'));
     }
@@ -57,6 +57,15 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Sanitize: remove thousand separators (.) and convert comma (,) to dot (.)
+        $price = $request->filled('price') ? str_replace(['.', ','], ['', '.'], $request->price) : 0;
+        $costPrice = $request->filled('cost_price') ? str_replace(['.', ','], ['', '.'], $request->cost_price) : 0;
+
+        $request->merge([
+            'price' => $price,
+            'cost_price' => $costPrice,
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string',
@@ -74,14 +83,14 @@ class ProductController extends Controller
         
         // Handle Quantity Logic
         // If quantity is provided and greater than 1, multiply the unit prices to store TOTALS
-        $quantity = $request->input('quantity', 1); // Default to 1 if not present
+        $quantity = (int) $request->input('quantity', 1); // Ensure integer
         $data['quantity'] = $quantity;
 
         // The inputs 'price' and 'cost_price' are considered UNIT prices from the form.
         // We calculate the total stored value for reports.
         if ($quantity > 1) {
-            $data['price'] = $request->price * $quantity;
-            $data['cost_price'] = ($request->cost_price ?? 0) * $quantity;
+            $data['price'] = $price * $quantity;
+            $data['cost_price'] = $costPrice * $quantity;
         }
 
         // Search Filter (Not relevant here, but keeping context clean)
@@ -121,6 +130,15 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = Product::findOrFail($id);
+
+        // Sanitize: remove thousand separators (.) and convert comma (,) to dot (.)
+        $price = $request->filled('price') ? str_replace(['.', ','], ['', '.'], $request->price) : 0;
+        $costPrice = $request->filled('cost_price') ? str_replace(['.', ','], ['', '.'], $request->cost_price) : 0;
+
+        $request->merge([
+            'price' => $price,
+            'cost_price' => $costPrice,
+        ]);
 
         $request->validate([
             'name' => 'required|string|max:255',

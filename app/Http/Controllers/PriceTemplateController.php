@@ -31,6 +31,7 @@ class PriceTemplateController extends Controller
     {
         $request->validate([
             'provider' => 'required|string',
+            'category' => 'required|string',
             'pattern' => 'required|string',
             'cost_price' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
@@ -56,6 +57,7 @@ class PriceTemplateController extends Controller
     {
         $request->validate([
             'provider' => 'required|string',
+            'category' => 'required|string',
             'pattern' => 'required|string',
             'cost_price' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
