@@ -98,21 +98,41 @@
                             @error('category_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Kode Provider -->
-                        <div class="group">
+                        <!-- Kode Provider (Custom Dropdown) -->
+                        <div class="group" style="position: relative;">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Operator</label>
+                            
+                            {{-- Hidden real select for form submission --}}
+                            <select name="code" id="provider_code" class="sr-only" tabindex="-1">
+                                <option value="" disabled selected>Pilih Operator</option>
+                                @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
+                                    <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Custom Dropdown Trigger --}}
                             <div class="relative">
+                                <button type="button" id="providerDropdownBtn" 
+                                    class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium cursor-pointer text-left @error('code') border-red-500 ring-1 ring-red-500 @enderror">
+                                    <span id="providerDropdownLabel" class="block truncate">{{ old('code') ?: 'Pilih Operator' }}</span>
+                                </button>
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 </div>
-                                <select name="code" id="provider_code" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium appearance-none cursor-pointer @error('code') border-red-500 ring-1 ring-red-500 @enderror">
-                                    <option value="" disabled selected>Pilih Operator</option>
-                                    @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
-                                        <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
-                                    @endforeach
-                                </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    <svg id="providerChevron" class="h-5 w-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+
+                                {{-- Dropdown Options List --}}
+                                <div id="providerDropdownList" 
+                                    class="hidden absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden"
+                                    style="z-index: 9999; max-height: 240px; overflow-y: auto;">
+                                    @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
+                                        <div class="provider-option px-4 py-2.5 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors text-sm font-medium text-slate-700 border-b border-slate-50 last:border-b-0 {{ old('code') == $provider ? 'bg-blue-50 text-blue-700 font-bold' : '' }}"
+                                            data-value="{{ $provider }}">
+                                            {{ $provider }}
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                             @error('code') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
@@ -225,6 +245,104 @@
         const providerSelect = document.getElementById('provider_code');
         const categorySelect = document.getElementById('category_id');
 
+        // === CUSTOM DROPDOWN CONTROLLER ===
+        const dropdownBtn = document.getElementById('providerDropdownBtn');
+        const dropdownList = document.getElementById('providerDropdownList');
+        const dropdownLabel = document.getElementById('providerDropdownLabel');
+        const dropdownChevron = document.getElementById('providerChevron');
+        const providerOptions = document.querySelectorAll('.provider-option');
+
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !dropdownList.classList.contains('hidden');
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+
+        function openDropdown() {
+            dropdownList.classList.remove('hidden');
+            dropdownChevron.style.transform = 'rotate(180deg)';
+            dropdownBtn.classList.add('ring-2', 'ring-blue-500/20', 'border-blue-500');
+        }
+
+        function closeDropdown() {
+            dropdownList.classList.add('hidden');
+            dropdownChevron.style.transform = 'rotate(0deg)';
+            dropdownBtn.classList.remove('ring-2', 'ring-blue-500/20', 'border-blue-500');
+        }
+
+        // Select option
+        providerOptions.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const value = opt.getAttribute('data-value');
+                
+                // Update hidden select
+                for (let i = 0; i < providerSelect.options.length; i++) {
+                    if (providerSelect.options[i].value === value) {
+                        providerSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                // Update label
+                dropdownLabel.textContent = value;
+                dropdownLabel.classList.remove('text-slate-400');
+                dropdownLabel.classList.add('text-slate-800');
+
+                // Update active style
+                providerOptions.forEach(o => {
+                    o.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
+                });
+                opt.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
+
+                closeDropdown();
+
+                // Trigger change event for template matching
+                providerSelect.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        // Function to sync custom dropdown label with hidden select value (for programmatic changes)
+        function syncDropdownLabel() {
+            const currentVal = providerSelect.value;
+            if (currentVal) {
+                dropdownLabel.textContent = currentVal;
+                dropdownLabel.classList.remove('text-slate-400');
+                dropdownLabel.classList.add('text-slate-800');
+                providerOptions.forEach(o => {
+                    o.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
+                    if (o.getAttribute('data-value') === currentVal) {
+                        o.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
+                    }
+                });
+            }
+        }
+
+        // Override the native selectedIndex setter to sync label
+        const origSelectedIndexSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex').set;
+        Object.defineProperty(providerSelect, 'selectedIndex', {
+            set: function(val) {
+                origSelectedIndexSetter.call(this, val);
+                syncDropdownLabel();
+            },
+            get: function() {
+                return Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex').get.call(this);
+            }
+        });
+        // === END CUSTOM DROPDOWN ===
+
         // Load Templates from Database
         const dbTemplates = @json($priceTemplates ?? []);
 
@@ -254,59 +372,121 @@
             });
         });
 
-        // --- Logic Pencarian Harga & Category Otomatis ---
+        // --- Logic Utama: Cek Template Dulu, Baru Heuristik ---
         function checkAndApplyTemplate() {
-            const currentName = nameInput.value.toLowerCase();
+            const currentName = nameInput.value.toLowerCase().trim();
             if (!currentName) return;
 
-            const currentProvider = providerSelect.value;
-            // Note: We prioritize finding a match even if category is not selected yet
-            
-            // Filter templates that match the selected provider (if selected)
-            // If provider is not selected, we look through all, but usually provider is auto-detected first
-            let relevantTemplates = dbTemplates;
-            if (currentProvider) {
-                relevantTemplates = dbTemplates.filter(t => t.provider === currentProvider);
+            const selectedProvider = providerSelect.value;
+            let bestMatch = null;
+            let maxMatchLen = 0;
+
+            // STRATEGI 1: Prioritaskan Template dari Provider yang SEDANG DIPILIH
+            // Tujuannya: Jika user mengetik "Pulsa 5000" (generic) dan mengganti provider, harga ikut berubah
+            if (selectedProvider) {
+                const providerTemplates = dbTemplates.filter(t => t.provider === selectedProvider);
+                providerTemplates.forEach(template => {
+                    const pattern = template.pattern.toLowerCase();
+                    if (currentName.includes(pattern)) {
+                         if (pattern.length > maxMatchLen) {
+                             maxMatchLen = pattern.length;
+                             bestMatch = template;
+                         }
+                    }
+                });
             }
 
-            // Find matching product pattern
-            const matchedTemplate = relevantTemplates.find(template => {
-                const keywords = template.pattern.toLowerCase().split(' ').map(k => k.trim());
-                return keywords.every(keyword => currentName.includes(keyword));
-            });
+            // STRATEGI 2: Jika tidak ada match di provider terpilih (atau belum pilih provider), Cari Global
+            // Ini menangani kasus Auto-Detect (user ketik "Indosat 5k" saat provider kosong atau salah pilih)
+            if (!bestMatch) {
+                // Reset max match len untuk pencarian global agar adil
+                // Tapi kita hanya ganti bestMatch jika kita menemukan match yang LEBIH SPESIFIK (lebih panjang)
+                // Atau jika bestMatch masih null
+                let globalMaxMatchLen = 0;
+                let globalBestMatch = null;
 
-            if (matchedTemplate) {
-                console.log("Template found:", matchedTemplate);
+                dbTemplates.forEach(template => {
+                    const pattern = template.pattern.toLowerCase();
+                    if (currentName.includes(pattern)) {
+                        if (pattern.length > globalMaxMatchLen) {
+                             globalMaxMatchLen = pattern.length;
+                             globalBestMatch = template;
+                        }
+                    }
+                });
 
-                // 1. Auto-set Category if it matches the template's category
+                // Gunakan hasil global jika:
+                // 1. Belum ada match lokal
+                // 2. Match global jauh lebih spesifik (pattern lebih panjang) daripada match lokal (opsional, hati-hati di sini)
+                // Saat ini kita pakai logika sederhana: kalau lokal kosong, pakai global.
+                // ATAU jika user mengetik nama provider lain secara eksplisit (misal "Indosat" saat "Telkomsel" dipilih),
+                // maka pattern "Indosat" (7 chars) mungkin lebih spesifik dari "Pulsa" (5 chars).
+                // Mari kita prioritaskan global match JIKA pattern-nya mengandung nama provider yang berbeda? 
+                // Simpelnya: jika globalMatchLen > maxMatchLen, replace.
+                if (globalBestMatch && globalMaxMatchLen > maxMatchLen) {
+                    bestMatch = globalBestMatch;
+                }
+            }
+
+            if (bestMatch) {
+                console.log("Template found:", bestMatch);
+                
+                // A. Set Provider (Jika global search menemukan provider berbeda, atau memastikan konsistensi)
+                let providerFound = false;
+                // Cek exact match dulu
+                for(let i=0; i<providerSelect.options.length; i++) {
+                     if(providerSelect.options[i].value === bestMatch.provider) {
+                         providerSelect.selectedIndex = i;
+                         providerFound = true;
+                         break;
+                     }
+                }
+                // Fallback mapping
+                if (!providerFound) {
+                    const map = {'tri': 'Three', 'three': 'Three', '3': 'Three'};
+                    const mapped = map[bestMatch.provider.toLowerCase()];
+                    if (mapped) {
+                         for(let i=0; i<providerSelect.options.length; i++) {
+                            if(providerSelect.options[i].value === mapped) {
+                                providerSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // B. Set Category
                 for(let i=0; i<categorySelect.options.length; i++) {
-                     if(categorySelect.options[i].getAttribute('data-name') === matchedTemplate.category) {
+                     if(categorySelect.options[i].getAttribute('data-name') === bestMatch.category) {
                          categorySelect.selectedIndex = i;
                          break;
                      }
                 }
 
-                // 2. Set Prices
-                costInput.value = formatRupiah(parseInt(matchedTemplate.cost_price));
-                priceInput.value = formatRupiah(parseInt(matchedTemplate.price));
+                // C. Set Harga
+                costInput.value = formatRupiah(parseInt(bestMatch.cost_price));
+                priceInput.value = formatRupiah(parseInt(bestMatch.price));
 
                 // Visual Feedback
-                costInput.classList.add('bg-green-50', 'text-green-700');
-                priceInput.classList.add('bg-green-50', 'text-green-700');
-                
-                setTimeout(() => {
-                    costInput.classList.remove('bg-green-50', 'text-green-700');
-                    priceInput.classList.remove('bg-green-50', 'text-green-700');
-                }, 1000);
+                [costInput, priceInput, providerSelect, categorySelect].forEach(el => {
+                    el.classList.add('bg-green-50', 'text-green-700', 'transition-colors', 'duration-500');
+                    setTimeout(() => el.classList.remove('bg-green-50', 'text-green-700'), 1000);
+                });
+
             } else {
-                // If no template match, use legacy keyword fallback for category (only if empty)
+                // 2. Jika Tidak Ada Template, Gunakan Deteksi Manual (Heuristik)
+                const currentProvider = providerSelect.value;
+                if (!currentProvider) {
+                    autoDetectProvider(currentName);
+                }
+                
                 if (categorySelect.value === "") {
                     autoDetectCategoryFallback(currentName);
                 }
             }
         }
 
-        // --- Logic Auto-Detect Provider ---
+        // --- Logic Auto-Detect Provider (Fallback) ---
         function autoDetectProvider(text) {
              if (providerSelect.value === "") {
                 const providerMap = {
@@ -339,7 +519,7 @@
             else if (text.includes('voucher') || text.includes('vc') || text.includes('fisik')) detectedCategoryName = 'Voucher';
             else if (text.includes('data') || text.includes('gb') || text.includes('quota') || text.includes('kuota') || text.includes('freedom') || text.includes('unlimited')) detectedCategoryName = 'Paket Data';
             else if (text.includes('pulsa') || text.includes('isi ulang')) detectedCategoryName = 'Pulsa';
-            else if (['ff', 'free fire', 'ml', 'mobile legends', 'game', 'top up'].some(k => text.includes(k))) detectedCategoryName = 'Top Up Game'; // Sesuaikan name di DB
+            else if (['ff', 'free fire', 'ml', 'mobile legends', 'game', 'top up'].some(k => text.includes(k))) detectedCategoryName = 'Top Up Game'; 
             
             if (detectedCategoryName) {
                 for(let i=0; i<categorySelect.options.length; i++) {
@@ -352,14 +532,26 @@
         }
 
         // Attach Listeners
-        nameInput.addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase();
-            autoDetectProvider(text); 
-            checkAndApplyTemplate(); 
+        // 1. On Input (Typing) - Optional, can be removed if user strictly wants Enter
+        // nameInput.addEventListener('input', (e) => checkAndApplyTemplate()); 
+        
+        // 2. On Enter Key
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submit
+                checkAndApplyTemplate();
+                // Optional: Move focus to next field (Quantity)
+                document.getElementById('quantity').focus();
+            }
         });
 
+        // 3. On Blur (Lost Focus)
+        nameInput.addEventListener('blur', () => {
+             checkAndApplyTemplate();
+        });
+
+        // 4. Manual Change on Provider/Category still triggers
         providerSelect.addEventListener('change', checkAndApplyTemplate);
-        // We still check template on category change, though usually name+provider drives it
         categorySelect.addEventListener('change', checkAndApplyTemplate);
 
     });

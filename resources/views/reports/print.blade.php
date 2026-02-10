@@ -6,6 +6,7 @@
     <title>Laporan Keuangan - {{ $monthName }}</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -64,7 +65,7 @@
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight mb-2">LAPORAN KEUANGAN</h2>
                     <div class="text-sm font-medium text-slate-600 space-y-1">
                         <p>Periode: <strong class="text-slate-900">{{ $monthName }}</strong></p>
-                        <p>Dicetak: <span class="text-slate-900 uppercase font-bold">{{ now()->format('d M Y • H:i') }}</span></p>
+                        <p>Dicetak: <span class="text-slate-900 uppercase font-bold">{{ now()->setTimezone('Asia/Jakarta')->format('d M Y • H:i') }} WIB</span></p>
                     </div>
                 </div>
             </div>
@@ -191,42 +192,88 @@
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pemasukan', 'Pengeluaran', 'Laba Bersih'],
-                    datasets: [{
-                        data: [revenue, cost, profit],
-                        backgroundColor: [
-                            '#10b981', // Emerald 500
-                            '#f43f5e', // Rose 500
-                            '#3b82f6'  // Blue 500
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
+                    labels: ['Pemasukan (Total)', 'Pengeluaran (Modal)', 'Laba (Keuntungan)'],
+                    datasets: [
+                        {
+                            // Outer Ring: Total Revenue (Green)
+                            data: [revenue],
+                            backgroundColor: ['#10b981'], // Emerald 500 (Pemasukan)
+                            borderWidth: 0,
+                            weight: 0.2, // Thinner outer ring
+                            labels: 'Pemasukan' // Custom label identifier
+                        },
+                        {
+                            // Inner Ring: Breakdown (Red & Blue)
+                            data: [cost, profit], 
+                            backgroundColor: [
+                                '#f43f5e', // Rose 500 (Pengeluaran)
+                                '#3b82f6'  // Blue 500 (Laba)
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            weight: 0.8 // Thicker inner ring
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false // Hide default legend, using our custom one
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
+                                    let value = context.raw;
+                                    let total = revenue;
+                                    
+                                    // Dataset Index 0: Outer Ring (Revenue)
+                                    if (context.datasetIndex === 0) {
+                                         return ' Total Pemasukan: ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
                                     }
-                                    if (context.parsed !== null) {
-                                        label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed);
-                                    }
-                                    return label;
+
+                                    // Dataset Index 1: Inner Ring (Breakdown)
+                                    // Map data index 0 -> Label 1 (Pengeluaran), data index 1 -> Label 2 (Laba)
+                                    let label = context.chart.data.labels[context.dataIndex + 1] || ''; 
+                                    let percentage = revenue > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                                    
+                                    return label + ': ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value) + ' (' + percentage + ')';
                                 }
                             }
                         }
                     },
-                    cutout: '75%', // Thinner ring for modern look
-                }
+                    cutout: '60%',
+                },
+                plugins: [{
+                    id: 'textCenter',
+                    beforeDraw: function(chart) {
+                        var width = chart.width,
+                            height = chart.height,
+                            ctx = chart.ctx;
+            
+                        ctx.restore();
+                        var fontSize = (height / 114).toFixed(2);
+                        ctx.font = "bold " + fontSize + "em sans-serif";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#3b82f6"; // Warna Biru Laba
+            
+            
+                        var margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) + "%" : "0%";
+                        var text = margin,
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height / 2;
+            
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = "bold " + (fontSize*0.35).toFixed(2) + "em sans-serif";
+                        ctx.fillStyle = "#64748b";
+                        var subtext = "Laba Bersih",
+                            subtextX = Math.round((width - ctx.measureText(subtext).width) / 2),
+                            subtextY = height / 2 + 20;
+                        ctx.fillText(subtext, subtextX, subtextY);
+
+                        ctx.save();
+                    }
+                }]
             });
 
             // Auto-print after a delay to ensure chart renders

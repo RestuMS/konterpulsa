@@ -181,11 +181,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             
+            // Data passed from DashboardController
+            const chartLabels = @json($chartLabels);
+            const chartDatasets = @json($chartDatasets);
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: @json($chartLabels),
-                    datasets: @json($chartDatasets)
+                    labels: chartLabels,
+                    datasets: chartDatasets
                 },
                 options: {
                     responsive: true,
@@ -193,26 +197,29 @@
                     plugins: {
                         legend: {
                             position: 'top',
-                            align: 'end',
+                            align: 'center',
                             labels: {
                                 usePointStyle: true,
                                 pointStyle: 'circle',
-                                padding: 20,
-                                font: { family: "'Outfit', sans-serif", weight: 500, size: 12 },
-                                color: '#94a3b8'
+                                padding: 25,
+                                font: { family: "'Inter', sans-serif", weight: 600, size: 12 },
+                                color: '#94a3b8', // Slate 400
+                                boxWidth: 8,
+                                boxHeight: 8
                             }
                         },
                         tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(30, 41, 59, 0.9)', // Darker tooltip for dashboard
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#cbd5e1',
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)', // Slate 900
+                            titleColor: '#f8fafc',
+                            bodyColor: '#e2e8f0',
                             borderColor: '#334155',
                             borderWidth: 1,
-                            padding: 12,
-                            titleFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
-                            bodyFont: { family: "'Outfit', sans-serif", size: 13 },
+                            padding: 14,
+                            cornerRadius: 8,
+                            titleFont: { family: "'Inter', sans-serif", size: 13, weight: 'bold' },
+                            bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                            displayColors: true,
+                            boxPadding: 4,
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
@@ -228,14 +235,17 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            border: { display: false },
                             grid: { 
-                                color: '#334155',
+                                color: '#334155', // Slate 700
                                 borderDash: [5, 5],
-                                drawBorder: false 
+                                drawBorder: false,
+                                tickLength: 0
                             },
                              ticks: { 
-                                color: '#94a3b8',
-                                font: { family: "'Outfit', sans-serif", size: 11 },
+                                color: '#64748b', // Slate 500
+                                font: { family: "'Inter', sans-serif", size: 11, weight: 500 },
+                                padding: 10,
                                 callback: function(value) {
                                     if (value >= 1000000) return (value/1000000) + 'jt';
                                     if (value >= 1000) return (value/1000) + 'k';
@@ -244,21 +254,25 @@
                             }
                         },
                         x: {
+                            border: { display: false },
                             grid: { display: false },
                              ticks: { 
-                                color: '#94a3b8',
-                                font: { family: "'Outfit', sans-serif", size: 11 }
+                                color: '#64748b',
+                                font: { family: "'Inter', sans-serif", size: 11 },
+                                maxRotation: 0,
+                                autoSkip: false,
+                                maxTicksLimit: 31
                             }
                         }
                     },
                     interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
+                        mode: 'index',
+                        intersect: false,
                     },
                     elements: {
                         bar: {
-                            borderRadius: 4
+                            borderRadius: 4, // Rounded bars like the image
+                            borderSkipped: false
                         }
                     }
                 }

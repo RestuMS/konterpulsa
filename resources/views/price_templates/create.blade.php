@@ -4,18 +4,6 @@
     </x-slot>
 
     <style>
-        /* Custom Select Dropdown Styling */
-        select option {
-            background-color: #1e293b !important;
-            color: white !important;
-            padding: 12px !important;
-        }
-        select option:hover,
-        select option:checked {
-            background: linear-gradient(to right, #ec4899, #8b5cf6) !important;
-            color: white !important;
-        }
-        
         /* Custom Number Input Spinner Styling */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
@@ -25,10 +13,26 @@
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+        /* Custom Dropdown Scrollbar */
+        .custom-dropdown-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-dropdown-list::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 0 12px 12px 0;
+        }
+        .custom-dropdown-list::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        .custom-dropdown-list::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
     </style>
 
     <div class="max-w-xl mx-auto">
-        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-hidden shadow-2xl shadow-black/30">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-visible shadow-2xl shadow-black/30">
             
             <!-- Header -->
             <div class="px-8 pt-8 pb-6">
@@ -46,38 +50,78 @@
             <form action="{{ route('price-templates.store') }}" method="POST" class="px-8 pb-8 space-y-5">
                 @csrf
 
-                <!-- Operator -->
-                <div class="space-y-2">
+                <!-- Operator (Custom Dropdown) -->
+                <div class="space-y-2" style="position: relative; z-index: 30;">
                     <label class="flex items-center gap-2 text-sm font-bold text-white">
                         <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         Operator
                     </label>
+
+                    {{-- Hidden select for form submission --}}
+                    <select name="provider" id="providerSelect" class="sr-only" tabindex="-1">
+                        @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
+                            <option value="{{ $p }}">{{ $p }}</option>
+                        @endforeach
+                    </select>
+
+                    {{-- Custom Dropdown --}}
                     <div class="relative">
-                        <select name="provider" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all appearance-none cursor-pointer">
-                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
-                                <option value="{{ $p }}" class="bg-slate-800 text-white py-3">{{ $p }}</option>
-                            @endforeach
-                        </select>
+                        <button type="button" id="providerDropdownBtn"
+                            class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer text-left pr-12">
+                            <span id="providerDropdownLabel" class="block truncate">Telkomsel</span>
+                        </button>
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg id="providerChevron" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+
+                        {{-- Dropdown List --}}
+                        <div id="providerDropdownList"
+                            class="custom-dropdown-list hidden absolute left-0 right-0 mt-2 bg-slate-800 border-2 border-slate-600 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
+                            style="z-index: 9999; max-height: 220px; overflow-y: auto;">
+                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
+                                <div class="provider-option px-4 py-3 cursor-pointer hover:bg-pink-500/20 hover:text-pink-300 transition-colors text-sm font-semibold text-slate-300 border-b border-slate-700/50 last:border-b-0 {{ $loop->first ? 'bg-pink-500/20 text-pink-300' : '' }}"
+                                    data-value="{{ $p }}">
+                                    {{ $p }}
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
 
-                <!-- Kategori -->
-                <div class="space-y-2">
+                <!-- Kategori (Custom Dropdown) -->
+                <div class="space-y-2" style="position: relative; z-index: 20;">
                     <label class="flex items-center gap-2 text-sm font-bold text-white">
                         <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                         Kategori
                     </label>
+
+                    {{-- Hidden select for form submission --}}
+                    <select name="category" id="categorySelect" class="sr-only" tabindex="-1">
+                        @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+
+                    {{-- Custom Dropdown --}}
                     <div class="relative">
-                        <select name="category" class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none cursor-pointer">
-                            @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
-                                <option value="{{ $c }}" class="bg-slate-800 text-white py-3">{{ $c }}</option>
-                            @endforeach
-                        </select>
+                        <button type="button" id="categoryDropdownBtn"
+                            class="w-full px-4 py-4 rounded-xl bg-slate-900 border-2 border-slate-600 text-white text-lg font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer text-left pr-12">
+                            <span id="categoryDropdownLabel" class="block truncate">Pulsa</span>
+                        </button>
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg id="categoryChevron" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+
+                        {{-- Dropdown List --}}
+                        <div id="categoryDropdownList"
+                            class="custom-dropdown-list hidden absolute left-0 right-0 mt-2 bg-slate-800 border-2 border-slate-600 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
+                            style="z-index: 9998; max-height: 220px; overflow-y: auto;">
+                            @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
+                                <div class="category-option px-4 py-3 cursor-pointer hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm font-semibold text-slate-300 border-b border-slate-700/50 last:border-b-0 {{ $loop->first ? 'bg-blue-500/20 text-blue-300' : '' }}"
+                                    data-value="{{ $c }}">
+                                    {{ $c }}
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -163,4 +207,99 @@
             </form>
         </div>
     </div>
+
+    {{-- Custom Dropdown JavaScript --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Generic dropdown initializer
+        function initCustomDropdown(config) {
+            const hiddenSelect = document.getElementById(config.selectId);
+            const btn = document.getElementById(config.btnId);
+            const list = document.getElementById(config.listId);
+            const label = document.getElementById(config.labelId);
+            const chevron = document.getElementById(config.chevronId);
+            const options = document.querySelectorAll(config.optionSelector);
+            const activeClass = config.activeClass;
+
+            if (!btn || !list || !label) return;
+
+            // Toggle
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = !list.classList.contains('hidden');
+                // Close all dropdowns first
+                document.querySelectorAll('.custom-dropdown-list').forEach(d => d.classList.add('hidden'));
+                document.querySelectorAll('[id$="Chevron"]').forEach(c => c.style.transform = 'rotate(0deg)');
+
+                if (!isOpen) {
+                    list.classList.remove('hidden');
+                    chevron.style.transform = 'rotate(180deg)';
+                    btn.classList.add('ring-2', config.ringClass, config.borderClass);
+                } else {
+                    btn.classList.remove('ring-2', config.ringClass, config.borderClass);
+                }
+            });
+
+            // Select option
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const value = opt.getAttribute('data-value');
+
+                    // Update hidden select
+                    for (let i = 0; i < hiddenSelect.options.length; i++) {
+                        if (hiddenSelect.options[i].value === value) {
+                            hiddenSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    // Update label
+                    label.textContent = value;
+
+                    // Update active style
+                    options.forEach(o => o.classList.remove(...activeClass));
+                    opt.classList.add(...activeClass);
+
+                    // Close
+                    list.classList.add('hidden');
+                    chevron.style.transform = 'rotate(0deg)';
+                    btn.classList.remove('ring-2', config.ringClass, config.borderClass);
+                });
+            });
+        }
+
+        // Init Operator dropdown
+        initCustomDropdown({
+            selectId: 'providerSelect',
+            btnId: 'providerDropdownBtn',
+            listId: 'providerDropdownList',
+            labelId: 'providerDropdownLabel',
+            chevronId: 'providerChevron',
+            optionSelector: '.provider-option',
+            activeClass: ['bg-pink-500/20', 'text-pink-300'],
+            ringClass: 'ring-pink-500',
+            borderClass: 'border-pink-500',
+        });
+
+        // Init Kategori dropdown
+        initCustomDropdown({
+            selectId: 'categorySelect',
+            btnId: 'categoryDropdownBtn',
+            listId: 'categoryDropdownList',
+            labelId: 'categoryDropdownLabel',
+            chevronId: 'categoryChevron',
+            optionSelector: '.category-option',
+            activeClass: ['bg-blue-500/20', 'text-blue-300'],
+            ringClass: 'ring-blue-500',
+            borderClass: 'border-blue-500',
+        });
+
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-dropdown-list').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('[id$="Chevron"]').forEach(c => c.style.transform = 'rotate(0deg)');
+        });
+    });
+    </script>
 </x-admin-layout>

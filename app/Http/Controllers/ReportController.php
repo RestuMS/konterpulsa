@@ -6,71 +6,86 @@ use App\Models\Transaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        // Default to current month if not specified
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
+        $cacheKey = "report_{$year}_{$month}_" . now()->format('Y-m-d-H');
 
-        // Filter Products created in the selected month
+        // Products query (needed for table display, not cacheable due to sorting)
         $products = Product::with('category')
                            ->whereMonth('created_at', $month)
                            ->whereYear('created_at', $year)
+                           ->latest()
                            ->get();
 
-        // --- Chart Logic ---
-        $targetCategories = ['Pulsa', 'Paket Data', 'Kartu Perdana', 'Voucher'];
-        $categories = \App\Models\Category::whereIn('name', $targetCategories)->get();
-        
-        $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
-        
-        $chartLabels = [];
-        for ($i = 1; $i <= $daysInMonth; $i++) {
-            $chartLabels[] = $i;
-        }
+        $reportData = Cache::remember($cacheKey, 300, function () use ($month, $year) {
+            // --- Optimized Chart Logic (single GROUP BY query) ---
+            $targetCategories = ['Pulsa', 'Paket Data', 'Kartu Perdana', 'Voucher'];
+            $categories = \App\Models\Category::whereIn('name', $targetCategories)->get();
 
-        $chartDatasets = [];
-        // Colors mapping: Pulsa (Green), Paket Data (Blue), Kartu Perdana (Purple), Voucher (Orange)
-        $colors = [
-            'Pulsa' => '#10b981', 
-            'Paket Data' => '#3b82f6', 
-            'Kartu Perdana' => '#a855f7', 
-            'Voucher' => '#f97316'
-        ];
+            $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
+            $chartLabels = range(1, $daysInMonth);
 
-        foreach ($categories as $category) {
-            $data = [];
-            for ($day = 1; $day <= $daysInMonth; $day++) {
-                $dailyRevenue = $products->filter(function ($product) use ($day, $category) {
-                    return $product->created_at->day == $day && $product->category_id == $category->id;
-                })->sum('price');
-                $data[] = $dailyRevenue;
+            $colors = [
+                'Pulsa' => '#10b981',
+                'Paket Data' => '#3b82f6',
+                'Kartu Perdana' => '#a855f7',
+                'Voucher' => '#f97316'
+            ];
+
+            // Single grouped query instead of nested loops
+            $dailyData = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->whereIn('category_id', $categories->pluck('id'))
+                ->selectRaw('category_id, DAY(created_at) as day, SUM(price) as daily_revenue')
+                ->groupBy('category_id', DB::raw('DAY(created_at)'))
+                ->get()
+                ->groupBy('category_id');
+
+            $chartDatasets = [];
+            foreach ($categories as $category) {
+                $categoryDailyData = isset($dailyData[$category->id])
+                    ? $dailyData[$category->id]->keyBy('day')
+                    : collect();
+
+                $data = [];
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $data[] = isset($categoryDailyData[$day]) ? $categoryDailyData[$day]->daily_revenue : 0;
+                }
+
+                $chartDatasets[] = [
+                    'label' => $category->name,
+                    'data' => $data,
+                    'backgroundColor' => $colors[$category->name] ?? '#64748b',
+                    'borderRadius' => 4,
+                    'barPercentage' => 0.7,
+                    'categoryPercentage' => 0.8
+                ];
             }
 
-            $chartDatasets[] = [
-                'label' => $category->name,
-                'data' => $data,
-                'backgroundColor' => $colors[$category->name] ?? '#64748b', // Fallback color
-                'borderRadius' => 4,
-                'barPercentage' => 0.7,
-                'categoryPercentage' => 0.8
-            ];
-        }
+            // Totals via single query
+            $totals = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->selectRaw('COALESCE(SUM(price), 0) as total_revenue, COALESCE(SUM(cost_price), 0) as total_cost')
+                ->first();
 
-        // Pemasukan based on Product Dashboard logic (Sum of prices of products added)
-        // Adjust this if you want to include stock: $products->sum(fn($p) => $p->price * $p->stock);
-        // For now, sticking to the simple Sum('price') as per ProductController logic
-        $totalRevenue = $products->sum('price');
-        $totalCost = $products->sum('cost_price');
-        $totalProfit = $totalRevenue - $totalCost;
+            $totalRevenue = $totals->total_revenue;
+            $totalCost = $totals->total_cost;
+            $totalProfit = $totalRevenue - $totalCost;
 
-        // Order by latest
-        $products = $products->sortByDesc('created_at');
+            return compact('chartLabels', 'chartDatasets', 'totalRevenue', 'totalCost', 'totalProfit');
+        });
 
-        return view('reports.index', compact('products', 'totalRevenue', 'totalCost', 'totalProfit', 'month', 'year', 'chartLabels', 'chartDatasets'));
+        return view('reports.index', array_merge(
+            ['products' => $products, 'month' => $month, 'year' => $year],
+            $reportData
+        ));
     }
 
     public function print(Request $request)
@@ -78,20 +93,21 @@ class ReportController extends Controller
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
 
-        $products = Product::whereMonth('created_at', $month)
-                           ->whereYear('created_at', $year)
-                           ->get();
+        // Single query for totals
+        $totals = Product::whereMonth('created_at', $month)
+                         ->whereYear('created_at', $year)
+                         ->selectRaw('COALESCE(SUM(price), 0) as total_revenue, COALESCE(SUM(cost_price), 0) as total_cost')
+                         ->first();
 
-        $totalRevenue = $products->sum('price');
-        $totalCost = $products->sum('cost_price');
+        $totalRevenue = $totals->total_revenue;
+        $totalCost = $totals->total_cost;
         $totalProfit = $totalRevenue - $totalCost;
-        
+
         $monthName = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
 
-        // Logic for Top 3 Best Selling Products
         $topProducts = Product::whereMonth('created_at', $month)
                             ->whereYear('created_at', $year)
-                            ->select('name', \Illuminate\Support\Facades\DB::raw('sum(quantity) as total_sold'))
+                            ->select('name', DB::raw('sum(quantity) as total_sold'))
                             ->groupBy('name')
                             ->orderByDesc('total_sold')
                             ->take(3)

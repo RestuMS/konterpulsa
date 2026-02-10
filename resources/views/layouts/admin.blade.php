@@ -4,18 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 
     <title>{{ config('app.name', 'Restu Cell') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-      <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Scripts & Styles -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <style>
         body { font-family: 'Outfit', sans-serif; }
@@ -173,5 +177,27 @@
             </main>
         </div>
     </div>
+    <!-- Prefetch script: pre-loads pages when hovering nav links -->
+    <script>
+        (function() {
+            const prefetched = new Set();
+            function prefetch(url) {
+                if (prefetched.has(url) || url === window.location.href) return;
+                prefetched.add(url);
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = url;
+                document.head.appendChild(link);
+            }
+            document.addEventListener('mouseover', function(e) {
+                const anchor = e.target.closest('a[href]');
+                if (!anchor) return;
+                const href = anchor.href;
+                if (href && href.startsWith(window.location.origin) && !href.includes('#')) {
+                    prefetch(href);
+                }
+            }, { passive: true });
+        })();
+    </script>
 </body>
 </html>

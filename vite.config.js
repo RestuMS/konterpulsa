@@ -9,7 +9,19 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/chart.js',
             ],
-            refresh: true,
+            refresh: [
+                'resources/views/**',
+                'routes/**',
+                'app/Http/Controllers/**',
+            ],
         }),
     ],
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: '192.168.13.110',
+            port: 5173,
+        },
+    },
 });
