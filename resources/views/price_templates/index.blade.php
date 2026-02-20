@@ -14,13 +14,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl flex items-center gap-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="bg-slate-800/50 rounded-2xl border border-slate-700/50 overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -48,11 +41,17 @@
                             <td class="px-6 py-4 text-right font-mono font-bold text-emerald-400">Rp {{ number_format($template->price, 0, ',', '.') }}</td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-3">
-                                    <a href="{{ route('price-templates.edit', $template->id) }}" class="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors">Edit</a>
-                                    <form action="{{ route('price-templates.destroy', $template->id) }}" method="POST" onsubmit="return confirm('Hapus template ini?');">
+                                    <a href="{{ route('price-templates.edit', $template->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 rounded-lg font-medium text-sm transition-all border border-blue-500/20 hover:border-blue-500/40">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        Edit
+                                    </a>
+                                    <form action="{{ route('price-templates.destroy', $template->id) }}" method="POST" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-400 hover:text-red-300 font-medium text-sm transition-colors">Hapus</button>
+                                        <button type="button" onclick="confirmDelete(this)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg font-medium text-sm transition-all border border-red-500/20 hover:border-red-500/40">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            Hapus
+                                        </button>
                                     </form>
                                 </div>
                             </td>
@@ -69,4 +68,98 @@
             </table>
         </div>
     </div>
+
+    {{-- SweetAlert2 CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // ✅ Konfirmasi Hapus dengan SweetAlert2
+        function confirmDelete(btn) {
+            Swal.fire({
+                title: 'Hapus Template?',
+                text: 'Template harga ini akan dihapus permanen dan tidak bisa dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<span class="flex items-center gap-2">🗑️ Ya, Hapus!</span>',
+                cancelButtonText: 'Batal',
+                background: '#1e293b',
+                color: '#f1f5f9',
+                customClass: {
+                    popup: 'rounded-2xl border border-slate-700',
+                    title: 'text-white',
+                    htmlContainer: 'text-slate-400',
+                    confirmButton: 'rounded-xl font-bold px-6 py-2.5',
+                    cancelButton: 'rounded-xl font-bold px-6 py-2.5',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown animate__faster'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp animate__faster'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.closest('form').submit();
+                }
+            });
+        }
+
+        // ✅ Notifikasi Otomatis dari Session Flash
+        document.addEventListener('DOMContentLoaded', () => {
+            @if(session('success'))
+                const action = '{{ session('action', 'store') }}';
+                
+                let icon, title, iconColor, timer;
+
+                if (action === 'store') {
+                    icon = 'success';
+                    title = '🎉 Berhasil Disimpan!';
+                    iconColor = '#10b981';
+                    timer = 3000;
+                } else if (action === 'update') {
+                    icon = 'success';
+                    title = '✏️ Berhasil Diperbarui!';
+                    iconColor = '#3b82f6';
+                    timer = 3000;
+                } else if (action === 'delete') {
+                    icon = 'success';
+                    title = '🗑️ Berhasil Dihapus!';
+                    iconColor = '#ef4444';
+                    timer = 3000;
+                }
+
+                Swal.fire({
+                    icon: icon,
+                    title: title,
+                    text: '{{ session('success') }}',
+                    iconColor: iconColor,
+                    timer: timer,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    background: '#1e293b',
+                    color: '#f1f5f9',
+                    toast: true,
+                    position: 'top-end',
+                    customClass: {
+                        popup: 'rounded-2xl border border-slate-700 shadow-2xl',
+                        title: 'text-sm font-bold',
+                        htmlContainer: 'text-xs',
+                        timerProgressBar: 'bg-emerald-500',
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__slideInRight animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__slideOutRight animate__faster'
+                    },
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+            @endif
+        });
+    </script>
 </x-admin-layout>

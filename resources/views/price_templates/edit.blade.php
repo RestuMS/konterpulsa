@@ -50,7 +50,7 @@
 
                     {{-- Hidden select for form submission --}}
                     <select name="provider" id="providerSelect" class="sr-only" tabindex="-1">
-                        @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
+                        @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'BNI', 'BCA', 'Mandiri', 'BRI', 'BTN', 'Top Up'] as $p)
                             <option value="{{ $p }}" {{ $priceTemplate->provider == $p ? 'selected' : '' }}>{{ $p }}</option>
                         @endforeach
                     </select>
@@ -69,7 +69,7 @@
                         <div id="providerDropdownList"
                             class="custom-dropdown-list hidden absolute left-0 right-0 mt-2 bg-slate-800 border-2 border-slate-600 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
                             style="z-index: 9999; max-height: 220px; overflow-y: auto;">
-                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik'] as $p)
+                            @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'BNI', 'BCA', 'Mandiri', 'BRI', 'BTN', 'Top Up'] as $p)
                                 <div class="provider-option px-4 py-3 cursor-pointer hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm font-semibold text-slate-300 border-b border-slate-700/50 last:border-b-0 {{ $priceTemplate->provider == $p ? 'bg-blue-500/20 text-blue-300' : '' }}"
                                     data-value="{{ $p }}">
                                     {{ $p }}
@@ -88,7 +88,7 @@
 
                     {{-- Hidden select for form submission --}}
                     <select name="category" id="categorySelect" class="sr-only" tabindex="-1">
-                        @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
+                        @foreach(['Pulsa', 'E-Wallet', 'Transfer', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
                             <option value="{{ $c }}" {{ $priceTemplate->category == $c ? 'selected' : '' }}>{{ $c }}</option>
                         @endforeach
                     </select>
@@ -107,7 +107,7 @@
                         <div id="categoryDropdownList"
                             class="custom-dropdown-list hidden absolute left-0 right-0 mt-2 bg-slate-800 border-2 border-slate-600 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
                             style="z-index: 9998; max-height: 220px; overflow-y: auto;">
-                            @foreach(['Pulsa', 'E-Wallet', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
+                            @foreach(['Pulsa', 'E-Wallet', 'Transfer', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana'] as $c)
                                 <div class="category-option px-4 py-3 cursor-pointer hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm font-semibold text-slate-300 border-b border-slate-700/50 last:border-b-0 {{ $priceTemplate->category == $c ? 'bg-blue-500/20 text-blue-300' : '' }}"
                                     data-value="{{ $c }}">
                                     {{ $c }}
@@ -262,6 +262,38 @@
             document.querySelectorAll('.custom-dropdown-list').forEach(d => d.classList.add('hidden'));
             document.querySelectorAll('[id$="Chevron"]').forEach(c => c.style.transform = 'rotate(0deg)');
         });
+    });
+    </script>
+
+    {{-- SweetAlert2 untuk notifikasi duplikat --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        @if(session('duplicate'))
+            Swal.fire({
+                icon: 'error',
+                title: '⚠️ Data Sudah Ada!',
+                html: `
+                    <div style="text-align:center; margin-top:8px;">
+                        <p style="color:#f87171; font-weight:700; font-size:14px; margin-bottom:8px;">
+                            {{ session('duplicate') }}
+                        </p>
+                        <p style="color:#94a3b8; font-size:12px;">
+                            Kombinasi Operator + Nama Produk ini sudah ada di template lain.
+                        </p>
+                    </div>
+                `,
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#3b82f6',
+                background: '#1e293b',
+                color: '#f1f5f9',
+                customClass: {
+                    popup: 'rounded-2xl border border-red-500/30 shadow-2xl',
+                    title: 'text-red-400',
+                    confirmButton: 'rounded-xl font-bold px-8 py-2.5',
+                },
+            });
+        @endif
     });
     </script>
 </x-admin-layout>

@@ -115,4 +115,147 @@ class ReportController extends Controller
 
         return view('reports.print', compact('totalRevenue', 'totalCost', 'totalProfit', 'monthName', 'topProducts'));
     }
+
+    /**
+     * Monthly Comparison Report
+     * Compares selected month vs previous month
+     */
+    public function comparison(Request $request)
+    {
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
+
+        // Calculate previous month/year
+        $prevDate = Carbon::createFromDate($year, $month, 1)->subMonth();
+        $prevMonth = $prevDate->month;
+        $prevYear = $prevDate->year;
+
+        $cacheKey = "comparison_{$year}_{$month}_" . now()->format('Y-m-d-H');
+
+        $comparisonData = Cache::remember($cacheKey, 300, function () use ($month, $year, $prevMonth, $prevYear) {
+
+            // ---- CURRENT MONTH TOTALS ----
+            $currentTotals = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->selectRaw('COALESCE(SUM(price), 0) as total_revenue, COALESCE(SUM(cost_price), 0) as total_cost, COUNT(*) as total_items')
+                ->first();
+
+            // ---- PREVIOUS MONTH TOTALS ----
+            $prevTotals = Product::whereMonth('created_at', $prevMonth)
+                ->whereYear('created_at', $prevYear)
+                ->selectRaw('COALESCE(SUM(price), 0) as total_revenue, COALESCE(SUM(cost_price), 0) as total_cost, COUNT(*) as total_items')
+                ->first();
+
+            $currentRevenue = $currentTotals->total_revenue;
+            $currentCost = $currentTotals->total_cost;
+            $currentProfit = $currentRevenue - $currentCost;
+            $currentItems = $currentTotals->total_items;
+
+            $prevRevenue = $prevTotals->total_revenue;
+            $prevCost = $prevTotals->total_cost;
+            $prevProfit = $prevRevenue - $prevCost;
+            $prevItems = $prevTotals->total_items;
+
+            // Percentage changes
+            $revenueChange = $prevRevenue > 0 ? round((($currentRevenue - $prevRevenue) / $prevRevenue) * 100, 1) : ($currentRevenue > 0 ? 100 : 0);
+            $costChange = $prevCost > 0 ? round((($currentCost - $prevCost) / $prevCost) * 100, 1) : ($currentCost > 0 ? 100 : 0);
+            $profitChange = $prevProfit > 0 ? round((($currentProfit - $prevProfit) / $prevProfit) * 100, 1) : ($currentProfit > 0 ? 100 : 0);
+            $itemsChange = $prevItems > 0 ? round((($currentItems - $prevItems) / $prevItems) * 100, 1) : ($currentItems > 0 ? 100 : 0);
+
+            // ---- DAILY DATA FOR LINE CHART ----
+            $daysInCurrentMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
+            $daysInPrevMonth = Carbon::createFromDate($prevYear, $prevMonth, 1)->daysInMonth;
+            $maxDays = max($daysInCurrentMonth, $daysInPrevMonth);
+
+            // Current month daily
+            $currentDaily = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->selectRaw('DAY(created_at) as day, COALESCE(SUM(price), 0) as revenue, COALESCE(SUM(cost_price), 0) as cost')
+                ->groupBy(DB::raw('DAY(created_at)'))
+                ->get()
+                ->keyBy('day');
+
+            // Previous month daily
+            $prevDaily = Product::whereMonth('created_at', $prevMonth)
+                ->whereYear('created_at', $prevYear)
+                ->selectRaw('DAY(created_at) as day, COALESCE(SUM(price), 0) as revenue, COALESCE(SUM(cost_price), 0) as cost')
+                ->groupBy(DB::raw('DAY(created_at)'))
+                ->get()
+                ->keyBy('day');
+
+            $lineLabels = range(1, $maxDays);
+            $currentRevenueDaily = [];
+            $prevRevenueDaily = [];
+            $currentProfitDaily = [];
+            $prevProfitDaily = [];
+
+            for ($d = 1; $d <= $maxDays; $d++) {
+                $cr = isset($currentDaily[$d]) ? $currentDaily[$d]->revenue : 0;
+                $cc = isset($currentDaily[$d]) ? $currentDaily[$d]->cost : 0;
+                $pr = isset($prevDaily[$d]) ? $prevDaily[$d]->revenue : 0;
+                $pc = isset($prevDaily[$d]) ? $prevDaily[$d]->cost : 0;
+
+                $currentRevenueDaily[] = $cr;
+                $prevRevenueDaily[] = $pr;
+                $currentProfitDaily[] = $cr - $cc;
+                $prevProfitDaily[] = $pr - $pc;
+            }
+
+            // ---- CATEGORY BREAKDOWN FOR BAR CHART ----
+            $targetCategories = ['Pulsa', 'Paket Data', 'Kartu Perdana', 'Voucher'];
+            $categories = \App\Models\Category::whereIn('name', $targetCategories)->get();
+
+            $currentCategoryData = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->whereIn('category_id', $categories->pluck('id'))
+                ->selectRaw('category_id, COALESCE(SUM(price), 0) as revenue')
+                ->groupBy('category_id')
+                ->get()
+                ->keyBy('category_id');
+
+            $prevCategoryData = Product::whereMonth('created_at', $prevMonth)
+                ->whereYear('created_at', $prevYear)
+                ->whereIn('category_id', $categories->pluck('id'))
+                ->selectRaw('category_id, COALESCE(SUM(price), 0) as revenue')
+                ->groupBy('category_id')
+                ->get()
+                ->keyBy('category_id');
+
+            $categoryLabels = [];
+            $currentCategoryRevenue = [];
+            $prevCategoryRevenue = [];
+            foreach ($categories as $cat) {
+                $categoryLabels[] = $cat->name;
+                $currentCategoryRevenue[] = isset($currentCategoryData[$cat->id]) ? $currentCategoryData[$cat->id]->revenue : 0;
+                $prevCategoryRevenue[] = isset($prevCategoryData[$cat->id]) ? $prevCategoryData[$cat->id]->revenue : 0;
+            }
+
+            // ---- TOP PRODUCTS COMPARISON ----
+            $currentTopProducts = Product::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->select('name', DB::raw('SUM(quantity) as total_qty'), DB::raw('SUM(price - COALESCE(cost_price, 0)) as total_profit'))
+                ->groupBy('name')
+                ->orderByDesc('total_qty')
+                ->take(5)
+                ->get();
+
+            return compact(
+                'currentRevenue', 'currentCost', 'currentProfit', 'currentItems',
+                'prevRevenue', 'prevCost', 'prevProfit', 'prevItems',
+                'revenueChange', 'costChange', 'profitChange', 'itemsChange',
+                'lineLabels', 'currentRevenueDaily', 'prevRevenueDaily',
+                'currentProfitDaily', 'prevProfitDaily',
+                'categoryLabels', 'currentCategoryRevenue', 'prevCategoryRevenue',
+                'currentTopProducts'
+            );
+        });
+
+        $currentMonthName = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
+        $prevMonthName = Carbon::createFromDate($year, $month, 1)->subMonth()->translatedFormat('F Y');
+
+        return view('reports.comparison', array_merge(
+            ['month' => $month, 'year' => $year, 'currentMonthName' => $currentMonthName, 'prevMonthName' => $prevMonthName],
+            $comparisonData
+        ));
+    }
 }

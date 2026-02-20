@@ -52,14 +52,8 @@
             
             <!-- Header -->
             <div class="flex justify-between items-start border-b-[3px] border-slate-900 pb-8 mb-10">
-                <div class="flex items-center gap-5">
-                    <div class="bg-slate-900 text-white p-4 rounded-xl shadow-lg print:shadow-none">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-black uppercase tracking-wider text-slate-900 leading-none">Restu Cell</h1>
-                        <p class="text-sm text-slate-500 font-bold tracking-[0.2em] uppercase mt-1.5">Management System</p>
-                    </div>
+                <div class="flex items-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Restu Cell Logo" class="h-32 w-auto object-contain">
                 </div>
                 <div class="text-right">
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight mb-2">LAPORAN KEUANGAN</h2>

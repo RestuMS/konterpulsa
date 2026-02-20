@@ -1,3 +1,7 @@
+@push('head-scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endpush
+
 <x-admin-layout>
     <x-slot name="header">
         Dashboard
@@ -85,11 +89,11 @@
         </div>
     </div>
 
-    <!-- Bottom Section: Table & Widget -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Bottom Section: Table -->
+    <div class="grid grid-cols-1 gap-6">
         
         <!-- Produk Laris Table -->
-        <div class="lg:col-span-2 bg-slate-800 rounded-xl border border-slate-700 shadow-lg p-6">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-lg p-6">
             <h3 class="text-lg font-bold text-white mb-4">Produk Laris (Top 5)</h3>
             <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">
@@ -144,34 +148,6 @@
                 @empty
                     <div class="p-6 text-center text-slate-500 italic">Belum ada transaksi</div>
                 @endforelse
-            </div>
-        </div>
-
-        <!-- Info Pemesanan Online -->
-        <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-lg p-6">
-            <h3 class="text-lg font-bold text-white mb-4">Info Pemesanan Online</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                    <div class="flex items-center gap-3">
-                         <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                         <span class="text-slate-300">Pesanan Baru</span>
-                    </div>
-                    <span class="font-bold text-white text-lg">5</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                    <div class="flex items-center gap-3">
-                         <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                         <span class="text-slate-300">Dalam Proses</span>
-                    </div>
-                    <span class="font-bold text-white text-lg">2</span>
-                </div>
-                <div class="flex justify-between items-center py-2">
-                    <div class="flex items-center gap-3">
-                         <div class="w-2 h-2 rounded-full bg-red-400"></div>
-                         <span class="text-slate-300">Dikirim</span>
-                    </div>
-                    <span class="font-bold text-white text-lg">10</span>
-                </div>
             </div>
         </div>
     </div>

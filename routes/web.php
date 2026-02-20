@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('transactions', TransactionController::class);
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/print', [ReportController::class, 'print'])->name('reports.print');
+    Route::get('/reports/comparison', [ReportController::class, 'comparison'])->name('reports.comparison');
 
     // 🔐 KHUSUS ADMIN
     Route::middleware(['role:admin'])->group(function () {

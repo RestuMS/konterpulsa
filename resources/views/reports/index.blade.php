@@ -1,3 +1,7 @@
+@push('head-scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endpush
+
 <x-admin-layout>
     <x-slot name="header">
         {{ __('Laporan Keuangan') }}
@@ -56,6 +60,12 @@
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                     <span class="md:hidden lg:inline">Cetak PDF</span>
                     <span class="hidden md:inline lg:hidden">PDF</span>
+                </a>
+
+                <a href="{{ route('reports.comparison', ['month' => request('month', now()->month), 'year' => request('year', now()->year)]) }}" class="w-full md:w-auto px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    <span class="md:hidden lg:inline">Perbandingan</span>
+                    <span class="hidden md:inline lg:hidden">VS</span>
                 </a>
             </div>
         </div>

@@ -4,19 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-    <title>{{ config('app.name', 'Restu Cell') }}</title>
+    <title>Konter POS</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @stack('head-scripts')
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -33,9 +34,34 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        /* Page loading bar */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            z-index: 9999;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        #page-loader.loading {
+            animation: loading-bar 1.5s ease-in-out;
+        }
+        @keyframes loading-bar {
+            0% { width: 0; }
+            20% { width: 30%; }
+            50% { width: 60%; }
+            80% { width: 85%; }
+            100% { width: 95%; }
+        }
     </style>
 </head>
 <body class="font-sans antialiased bg-slate-900 text-slate-200" x-data="{ sidebarOpen: false }">
+    <!-- Page Loading Bar -->
+    <div id="page-loader"></div>
+    
     <div class="min-h-screen flex bg-slate-900 relative">
         
         <!-- Mobile Backdrop -->
@@ -55,15 +81,13 @@
         <aside class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-800 flex-shrink-0 transition-transform duration-300 ease-in-out flex flex-col border-r border-slate-700/50 md:translate-x-0 md:static md:inset-auto transform"
                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
                id="sidebar">
-            <div class="h-16 flex items-center justify-between px-6 border-b border-slate-700/50">
-                <div class="flex items-center gap-3 font-bold text-xl tracking-wider text-pink-500">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <span class="text-white">Sales<span class="text-slate-400 font-light ml-1">Mgt</span></span>
-                </div>
+            <div class="h-16 flex items-center justify-center px-6 border-b border-slate-700/50">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 group">
+                    <img src="{{ asset('images/logo.png') }}" alt="Restu Cell Logo" class="h-10 w-auto object-contain transition-transform group-hover:scale-110 drop-shadow-md">
+                    <span class="font-bold text-xl text-white tracking-tight">Restu<span class="text-blue-400">Cell</span></span>
+                </a>
                 <!-- Mobile Close Button -->
-                <button @click="sidebarOpen = false" class="md:hidden text-slate-400 hover:text-white transition-colors">
+                <button @click="sidebarOpen = false" class="md:hidden absolute right-4 text-slate-400 hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -80,9 +104,14 @@
                     <span class="font-medium">Transaksi</span>
                 </a>
 
-                <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('reports.*') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-pink-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                <a href="{{ route('reports.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('reports.index') || request()->routeIs('reports.print') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-pink-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     <span class="font-medium">Laporan</span>
+                </a>
+
+                <a href="{{ route('reports.comparison') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('reports.comparison') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-pink-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    <span class="font-medium">Perbandingan</span>
                 </a>
 
                 <a href="{{ route('price-templates.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('price-templates.*') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-pink-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
@@ -177,9 +206,38 @@
             </main>
         </div>
     </div>
-    <!-- Prefetch script: pre-loads pages when hovering nav links -->
+    <!-- Prefetch, Loading Bar & Auto-Reload Script -->
     <script>
         (function() {
+            // Loading bar on navigation
+            const loader = document.getElementById('page-loader');
+            document.addEventListener('click', function(e) {
+                const anchor = e.target.closest('a[href]');
+                if (!anchor) return;
+                const href = anchor.href;
+                if (href && href.startsWith(window.location.origin) && !href.includes('#') && !anchor.hasAttribute('download') && anchor.target !== '_blank') {
+                    loader.style.width = '0';
+                    loader.classList.add('loading');
+                    loader.style.width = '95%';
+                }
+            }, { passive: true });
+
+            // Complete loading bar when page is loaded
+            window.addEventListener('pageshow', function() {
+                loader.style.transition = 'width 0.2s ease';
+                loader.style.width = '100%';
+                setTimeout(function() {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.width = '0';
+                        loader.style.opacity = '1';
+                        loader.style.transition = 'width 0.3s ease';
+                        loader.classList.remove('loading');
+                    }, 200);
+                }, 200);
+            });
+
+            // Prefetch on hover
             const prefetched = new Set();
             function prefetch(url) {
                 if (prefetched.has(url) || url === window.location.href) return;
@@ -197,7 +255,50 @@
                     prefetch(href);
                 }
             }, { passive: true });
+
+            // === AUTO-RELOAD ===
+            // Cek apakah halaman ini adalah form (create/edit) — jangan auto-reload
+            function isFormPage() {
+                var url = window.location.href.toLowerCase();
+                if (url.includes('/create') || url.includes('/edit')) return true;
+                // Cek juga apakah ada form dengan input yang sudah diisi
+                var forms = document.querySelectorAll('form');
+                for (var i = 0; i < forms.length; i++) {
+                    var inputs = forms[i].querySelectorAll('input[type="text"], input[type="number"], textarea, select');
+                    for (var j = 0; j < inputs.length; j++) {
+                        if (inputs[j].value && inputs[j].value.trim() !== '' && inputs[j].type !== 'hidden') return true;
+                    }
+                }
+                return false;
+            }
+
+            // Reload otomatis saat user kembali ke tab (setelah 60 detik tidak aktif)
+            var lastActivity = Date.now();
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    var inactiveTime = Date.now() - lastActivity;
+                    // Jika tab tidak aktif lebih dari 60 detik DAN bukan halaman form
+                    if (inactiveTime > 60000 && !isFormPage()) {
+                        loader.style.width = '0';
+                        loader.classList.add('loading');
+                        loader.style.width = '95%';
+                        window.location.reload();
+                    }
+                } else {
+                    lastActivity = Date.now();
+                }
+            });
+
+            // Auto-reload setiap 5 menit untuk data terbaru (hanya di halaman non-form)
+            setTimeout(function autoReload() {
+                if (document.visibilityState === 'visible' && !isFormPage()) {
+                    window.location.reload();
+                } else {
+                    setTimeout(autoReload, 300000);
+                }
+            }, 300000); // 5 menit
         })();
     </script>
+    @stack('scripts')
 </body>
 </html>

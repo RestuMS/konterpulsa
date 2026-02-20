@@ -1,3 +1,7 @@
+@push('head-scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
+
 <x-admin-layout>
     <x-slot name="header">
         {{ __('Transaction Management') }}
@@ -10,11 +14,22 @@
         </a>
     </div>
 
-    <!-- Success Message -->
+    <!-- Success Message (SweetAlert Trigger) -->
     @if(session('success'))
-        <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg shadow-sm">
-            {{ session('success') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Transaksi Sukses!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonText: 'Oke',
+                    confirmButtonColor: '#3b82f6',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    backdrop: `rgba(0,0,0,0.4)`
+                });
+            });
+        </script>
     @endif
 
     <!-- Search Form -->

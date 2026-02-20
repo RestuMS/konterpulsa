@@ -1,235 +1,87 @@
+@push('head-scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
+
 <x-admin-layout>
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden relative">
-            
-            <!-- Header -->
-            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight font-display">Tambah Transaksi</h2>
-                    <p class="text-slate-500 text-sm mt-1">Input data transaksi baru ke dalam sistem</p>
-                </div>
-                <a href="{{ route('products.index') }}" class="group p-2 rounded-full hover:bg-red-50 transition-colors duration-200">
-                    <svg class="w-6 h-6 text-slate-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </a>
+    <div class="min-h-screen p-4 md:p-8 bg-slate-50">
+        
+        <!-- Header -->
+        <div class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-slate-800 tracking-tight font-display">Mode Transaksi Banyak</h2>
+                <p class="text-slate-500 mt-1">Input beberapa transaksi sekaligus untuk efisiensi waktu.</p>
             </div>
+            <div class="flex gap-3">
+                <a href="{{ route('products.index') }}" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-medium transition-all shadow-sm">
+                    Kembali
+                </a>
+                <button type="button" onclick="submitForm()" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transform hover:scale-[1.02] transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Simpan Semua
+                </button>
+            </div>
+        </div>
 
-            <!-- Form -->
-            <form id="productForm" action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
+        <!-- Form Container -->
+        <div class="max-w-full mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <form id="bulkForm" action="{{ route('products.store') }}" method="POST">
                 @csrf
-
-                <div class="space-y-6">
-
-                    <!-- Global Error Summary -->
-                    @if ($errors->any())
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-6">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">Terdapat kesalahan pada input:</h3>
-                                    <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Tanggal Transaksi (Optional) -->
-                    <div class="group">
-                        <label for="created_at" class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Transaksi <span class="text-slate-400 font-normal text-xs">(Opsional - Untuk input tanggal mundur)</span></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            </div>
-                            <input type="date" name="created_at" id="created_at" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium cursor-pointer">
-                        </div>
-                    </div>
-                    
-                    <!-- Nama Produk & Qty -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="group md:col-span-3">
-                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Nama Produk</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                </div>
-                                <input type="text" name="name" id="name" value="{{ old('name') }}" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400 font-medium @error('name') border-red-500 ring-1 ring-red-500 @enderror" placeholder="Contoh: Pulsa 10k" required>
-                                @error('name') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                        
-                        <!-- Quantity -->
-                         <div class="group">
-                            <label for="quantity" class="block text-sm font-semibold text-slate-700 mb-2">Jumlah (Qty)</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-slate-400 font-bold text-xs uppercase">x</span>
-                                </div>
-                                <input type="number" name="quantity" id="quantity" value="1" min="1" class="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-bold text-center" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kategori & Kode Provider Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <!-- Kategori -->
-                        <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Kategori</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-white z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                </div>
-                                <select name="category_id" id="category_id" class="w-full pl-10 pr-10 py-3 bg-blue-600 border border-blue-600 text-white rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-700 transition-all font-semibold appearance-none cursor-pointer hover:bg-blue-700 @error('category_id') border-red-500 ring-1 ring-red-500 @enderror">
-                                    <option value="" disabled selected class="text-slate-500 bg-white">Pilih Kategori</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" data-name="{{ $category->name }}" {{ old('category_id') == $category->id ? 'selected' : '' }} class="bg-white text-slate-800">
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/80">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                            @error('category_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Kode Provider (Custom Dropdown) -->
-                        <div class="group" style="position: relative;">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Operator</label>
-                            
-                            {{-- Hidden real select for form submission --}}
-                            <select name="code" id="provider_code" class="sr-only" tabindex="-1">
-                                <option value="" disabled selected>Pilih Operator</option>
-                                @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
-                                    <option value="{{ $provider }}" {{ old('code') == $provider ? 'selected' : '' }}>{{ $provider }}</option>
-                                @endforeach
-                            </select>
-
-                            {{-- Custom Dropdown Trigger --}}
-                            <div class="relative">
-                                <button type="button" id="providerDropdownBtn" 
-                                    class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-medium cursor-pointer text-left @error('code') border-red-500 ring-1 ring-red-500 @enderror">
-                                    <span id="providerDropdownLabel" class="block truncate">{{ old('code') ?: 'Pilih Operator' }}</span>
-                                </button>
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                </div>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                    <svg id="providerChevron" class="h-5 w-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-
-                                {{-- Dropdown Options List --}}
-                                <div id="providerDropdownList" 
-                                    class="hidden absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden"
-                                    style="z-index: 9999; max-height: 240px; overflow-y: auto;">
-                                    @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
-                                        <div class="provider-option px-4 py-2.5 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors text-sm font-medium text-slate-700 border-b border-slate-50 last:border-b-0 {{ old('code') == $provider ? 'bg-blue-50 text-blue-700 font-bold' : '' }}"
-                                            data-value="{{ $provider }}">
-                                            {{ $provider }}
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @error('code') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <!-- Harga Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Harga Beli -->
-                        <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Harga Beli (Modal)</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-slate-400 font-bold group-focus-within:text-red-500 transition-colors">Rp</span>
-                                </div>
-                                <input type="text" name="cost_price" id="cost_price" value="{{ old('cost_price') }}" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-800 font-mono font-bold @error('cost_price') border-red-500 ring-1 ring-red-500 @enderror" required>
-                                @error('cost_price') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <!-- Harga Jual -->
-                        <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Harga Jual</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-slate-400 font-bold group-focus-within:text-green-500 transition-colors">Rp</span>
-                                </div>
-                                <input type="text" name="price" id="price" value="{{ old('price') }}" placeholder="0" class="rupiah-input w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-slate-800 font-mono font-bold @error('price') border-red-500 ring-1 ring-red-500 @enderror" required>
-                                @error('price') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                     <!-- Status & Pelanggan Grid -->
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Status Pembayaran -->
-                        <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Status Pembayaran</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
-                                <select name="payment_status" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 font-bold appearance-none cursor-pointer">
-                                    <option value="paid" class="text-emerald-600 font-bold">LUNAS</option>
-                                    <option value="unpaid" class="text-rose-600 font-bold">HUTANG / KASBON</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                         <!-- Nama Pelanggan -->
-                         <div class="group">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Pelanggan <span class="text-slate-400 font-normal text-xs">(Opsional)</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                </div>
-                                <input type="text" name="customer_name" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder-slate-400" placeholder="Isi jika Kasbon">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stok (Quick Select) -->
-                    <div class="group">
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">Ketersediaan Stok</label>
-                        <div class="grid grid-cols-2 gap-4">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="stock_status" value="available" class="peer sr-only" checked onchange="document.getElementById('stock').value = 100">
-                                <div class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 peer-checked:bg-emerald-50 peer-checked:border-emerald-500 peer-checked:text-emerald-700 transition-all font-medium hover:bg-slate-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    Stok Tersedia
-                                </div>
-                            </label>
-                             <label class="cursor-pointer">
-                                <input type="radio" name="stock_status" value="empty" class="peer sr-only" onchange="document.getElementById('stock').value = 0">
-                                <div class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 peer-checked:bg-slate-800 peer-checked:border-slate-800 peer-checked:text-white transition-all font-medium hover:bg-slate-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    Stok Habis
-                                </div>
-                            </label>
-                        </div>
-                        <input type="hidden" name="stock" id="stock" value="100">
-                    </div>
-
+                
+                <!-- Global Date Selection (Optional override per row?) -->
+                {{-- Uncomment if you want a global date for all 
+                <div class="p-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-4">
+                    <label class="text-sm font-semibold text-slate-700">Tanggal Transaksi:</label>
+                    <input type="date" name="global_date" class="..." onchange="updateAllDates(this.value)">
                 </div>
+                --}}
 
-                <!-- Footer Actions -->
-                <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-                    <a href="{{ route('products.index') }}" class="px-6 py-3 rounded-xl text-slate-500 font-semibold hover:bg-slate-100 hover:text-slate-700 transition-all">
-                        Batal
-                    </a>
-                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 transform hover:scale-[1.02] transition-all flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                        Simpan Transaksi
-                    </button>
+                @if ($errors->any())
+                    <div class="p-6 bg-red-50 border-b border-red-100">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <div>
+                                <h3 class="text-sm font-medium text-red-800">Terdapat kesalahan input. Mohon periksa kembali.</h3>
+                                <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+                    <table class="w-full text-left border-collapse" id="transactionTable">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs uppercase tracking-wider font-bold shadow-sm">
+                                <th class="p-4 w-14 text-center border-r border-blue-500/30 text-blue-50">#</th>
+                                <th class="p-4 min-w-[220px] whitespace-nowrap">Nama Produk</th>
+                                <th class="p-4 w-24 text-center whitespace-nowrap text-blue-50">Qty</th>
+                                <th class="p-4 min-w-[180px] whitespace-nowrap">Kategori & Operator</th>
+                                <th class="p-4 min-w-[140px] whitespace-nowrap">Harga Beli (Modal)</th>
+                                <th class="p-4 min-w-[140px] whitespace-nowrap">Harga Jual</th>
+                                <th class="p-4 min-w-[160px] whitespace-nowrap">Status & Pelanggan</th>
+                                <th class="p-4 w-24 text-center whitespace-nowrap border-l border-blue-500/30">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700 bg-white">
+                            <!-- Rows will be injected here via JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-50 border-t border-slate-200">
+                                <td colspan="8" class="p-4 text-center">
+                                    <button type="button" onclick="addRow()" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-600 font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 hover:shadow-sm transition-all text-sm w-full md:w-auto justify-center group">
+                                        <div class="p-0.5 bg-slate-100 rounded group-hover:bg-blue-200 transition-colors">
+                                            <svg class="w-4 h-4 text-slate-500 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        </div>
+                                        <span>Tambah Baris</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
 
             </form>
@@ -237,155 +89,245 @@
     </div>
 </x-admin-layout>
 
+<!-- Hidden Template for JS Row Cloning -->
+<template id="rowTemplate">
+    <tr class="group hover:bg-blue-50/30 transition-all duration-300 align-top row-item border-b border-indigo-50 last:border-0 odd:bg-white even:bg-slate-50/30">
+        <td class="p-4 text-center border-r border-indigo-50 align-top pt-5">
+            <span class="row-number inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold text-xs shadow-sm ring-2 ring-white">1</span>
+        </td>
+        
+        <!-- Produkt Name & Date -->
+        <td class="p-4 space-y-2 align-top">
+            <div class="relative group/input">
+                <input type="text" name="items[INDEX][name]" class="input-name w-full px-4 py-2.5 bg-white border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm font-semibold text-slate-700 placeholder-slate-400 transition-all shadow-sm hover:border-indigo-300" placeholder="Ketik nama produk..." required>
+                <!-- Focus Indicator/Glow -->
+                <div class="absolute inset-0 rounded-xl ring-1 ring-indigo-500/0 group-focus-within/input:ring-indigo-500/50 pointer-events-none transition-all"></div>
+            </div>
+            <!-- Optional Date Per Row -->
+            <div class="relative group/date w-fit">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-3.5 h-3.5 text-slate-400 group-focus-within/date:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                 <input type="date" name="items[INDEX][created_at]" class="pl-9 pr-3 py-1.5 bg-slate-50 border border-transparent rounded-lg text-xs font-medium text-slate-500 hover:bg-white hover:border-slate-200 hover:shadow-sm focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:text-indigo-600 transition-all cursor-pointer" title="Tanggal Transaksi (Opsi)">
+            </div>
+        </td>
+
+        <!-- Quantity -->
+        <td class="p-4 align-top pt-5">
+            <div class="flex items-center justify-center">
+                <div class="relative w-20 group/qty">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold pointer-events-none group-focus-within/qty:text-indigo-500 transition-colors">x</span>
+                    <input type="number" name="items[INDEX][quantity]" value="1" min="1" class="w-full pl-7 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-center font-bold text-slate-700 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm hover:border-indigo-300">
+                </div>
+            </div>
+        </td>
+
+        <!-- Category & Operator -->
+        <td class="p-4 space-y-2 align-top">
+            <div class="relative group/cat">
+                <select name="items[INDEX][category_id]" class="input-category w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer hover:border-indigo-300 shadow-sm" required>
+                    <option value="" disabled selected>Pilih Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" data-name="{{ $category->name }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-400 group-focus-within/cat:text-indigo-500 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+            
+            <div class="relative group/op">
+                <select name="items[INDEX][code]" class="input-provider w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer hover:border-indigo-300 shadow-sm" required>
+                    <option value="" disabled selected>Pilih Operator</option>
+                    @foreach(['Telkomsel', 'Indosat', 'Three', 'XL', 'Axis', 'Smartfren', 'By.U', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'BNI', 'BCA', 'Mandiri', 'BRI', 'BTN', 'Pajak', 'BPJS', 'Free Fire', 'Mobile Legends', 'Voucher', 'Paket Data', 'Kartu Perdana', 'Lainnya'] as $provider)
+                        <option value="{{ $provider }}">{{ $provider }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-400 group-focus-within/op:text-indigo-500 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+        </td>
+
+        <!-- Cost Price -->
+        <td class="p-4 align-top pt-5">
+            <div class="relative group/price">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold transition-colors group-focus-within/price:text-red-500">Rp</span>
+                <input type="text" name="items[INDEX][cost_price]" placeholder="0" class="input-cost w-full pl-8 pr-3 py-2 bg-slate-50/30 border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-600 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 focus:text-slate-900 transition-all shadow-sm hover:border-red-200 rupiah-input" required>
+            </div>
+        </td>
+
+        <!-- Selling Price -->
+        <td class="p-4 align-top pt-5">
+             <div class="relative group/price">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold transition-colors group-focus-within/price:text-emerald-500">Rp</span>
+                <input type="text" name="items[INDEX][price]" placeholder="0" class="input-price w-full pl-8 pr-3 py-2 bg-emerald-50/30 border border-emerald-100 rounded-lg text-sm font-mono font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm hover:border-emerald-300 rupiah-input" required>
+            </div>
+        </td>
+
+        <!-- Status & Customer -->
+        <td class="p-4 space-y-2 align-top">
+            <div class="relative group/status">
+                <select name="items[INDEX][payment_status]" class="input-status w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm hover:border-indigo-300" onchange="toggleCustomerInput(this)">
+                    <option value="paid" class="text-emerald-600 font-bold">LUNAS</option>
+                    <option value="unpaid" class="text-rose-600 font-bold">BELUM LUNAS</option>
+                </select>
+                <!-- Custom Status Icon -->
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none status-icon-container">
+                     <!-- Default Check Icon for Paid -->
+                     <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-400 group-focus-within/status:text-indigo-500">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+            
+            <div class="relative input-customer-wrapper hidden animate-fade-in-down group/cust">
+                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                    <svg class="w-3.5 h-3.5 text-orange-400 group-focus-within/cust:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <input type="text" name="items[INDEX][customer_name]" class="input-customer w-full pl-8 pr-3 py-2 bg-orange-50 border border-orange-200 rounded-lg text-xs font-bold text-orange-800 placeholder-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all shadow-sm" placeholder="Nama Pelanggan">
+            </div>
+        </td>
+
+        <!-- Actions -->
+        <td class="p-4 text-center align-middle border-l border-indigo-50/50">
+            <button type="button" onclick="removeRow(this)" class="group inline-flex items-center justify-center p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5" title="Hapus Baris">
+                <svg class="w-5 h-5 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+            <input type="hidden" name="items[INDEX][stock]" value="100">
+        </td>
+    </tr>
+</template>
+
 <script>
+    const dbTemplates = @json($priceTemplates ?? []);
+    let rowIndex = 0;
+
     document.addEventListener('DOMContentLoaded', () => {
-        const nameInput = document.getElementById('name');
-        const costInput = document.getElementById('cost_price');
-        const priceInput = document.getElementById('price');
-        const providerSelect = document.getElementById('provider_code');
-        const categorySelect = document.getElementById('category_id');
+        // Add initial row (only 1)
+        for(let i=0; i<1; i++) {
+            addRow();
+        }
+    });
 
-        // === CUSTOM DROPDOWN CONTROLLER ===
-        const dropdownBtn = document.getElementById('providerDropdownBtn');
-        const dropdownList = document.getElementById('providerDropdownList');
-        const dropdownLabel = document.getElementById('providerDropdownLabel');
-        const dropdownChevron = document.getElementById('providerChevron');
-        const providerOptions = document.querySelectorAll('.provider-option');
+    function addRow() {
+        const template = document.getElementById('rowTemplate');
+        const tbody = document.getElementById('tableBody');
+        const clone = template.content.cloneNode(true);
+        const tr = clone.querySelector('tr');
 
-        // Toggle dropdown
-        dropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = !dropdownList.classList.contains('hidden');
-            if (isOpen) {
-                closeDropdown();
-            } else {
-                openDropdown();
-            }
-        });
+        // Replace INDEX with rowIndex
+        tr.innerHTML = tr.innerHTML.replace(/INDEX/g, rowIndex);
+        
+        // Update Row Number
+        const rowNum = tbody.children.length + 1;
+        tr.querySelector('.row-number').textContent = rowNum;
 
-        function openDropdown() {
-            dropdownList.classList.remove('hidden');
-            dropdownChevron.style.transform = 'rotate(180deg)';
-            dropdownBtn.classList.add('ring-2', 'ring-blue-500/20', 'border-blue-500');
+        // Initialize Row Logic
+        initializeRow(tr, rowIndex);
+
+        tbody.appendChild(tr);
+        
+        // Focus on the first input of the new row if it's not the initial load
+        if (rowIndex > 0) {
+             const firstInput = tr.querySelector('.input-name');
+             if(firstInput) firstInput.focus();
         }
 
-        function closeDropdown() {
-            dropdownList.classList.add('hidden');
-            dropdownChevron.style.transform = 'rotate(0deg)';
-            dropdownBtn.classList.remove('ring-2', 'ring-blue-500/20', 'border-blue-500');
+        rowIndex++;
+        updateRowNumbers();
+    }
+
+    function removeRow(btn) {
+        const tr = btn.closest('tr');
+        const tbody = document.getElementById('tableBody');
+        if (tbody.children.length > 1) {
+            tr.remove();
+            updateRowNumbers();
+        } else {
+            // If dragging last row, maybe just clear inputs?
+            // For now, allow remove unless it's the very last one? 
+            // Just Alert
+             alert("Minimal satu baris transaksi harus ada.");
         }
+    }
 
-        // Select option
-        providerOptions.forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const value = opt.getAttribute('data-value');
-                
-                // Update hidden select
-                for (let i = 0; i < providerSelect.options.length; i++) {
-                    if (providerSelect.options[i].value === value) {
-                        providerSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-
-                // Update label
-                dropdownLabel.textContent = value;
-                dropdownLabel.classList.remove('text-slate-400');
-                dropdownLabel.classList.add('text-slate-800');
-
-                // Update active style
-                providerOptions.forEach(o => {
-                    o.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
-                });
-                opt.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
-
-                closeDropdown();
-
-                // Trigger change event for template matching
-                providerSelect.dispatchEvent(new Event('change'));
-            });
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach((row, index) => {
+            row.querySelector('.row-number').textContent = index + 1;
         });
+    }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
-                closeDropdown();
-            }
-        });
-
-        // Function to sync custom dropdown label with hidden select value (for programmatic changes)
-        function syncDropdownLabel() {
-            const currentVal = providerSelect.value;
-            if (currentVal) {
-                dropdownLabel.textContent = currentVal;
-                dropdownLabel.classList.remove('text-slate-400');
-                dropdownLabel.classList.add('text-slate-800');
-                providerOptions.forEach(o => {
-                    o.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
-                    if (o.getAttribute('data-value') === currentVal) {
-                        o.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
-                    }
-                });
-            }
+    function toggleCustomerInput(selectInfo) {
+        const tr = selectInfo.closest('tr');
+        const customerWrapper = tr.querySelector('.input-customer-wrapper');
+        const customerInput = tr.querySelector('.input-customer');
+        
+        if (selectInfo.value === 'unpaid') {
+            customerWrapper.classList.remove('hidden');
+            customerWrapper.classList.add('flex'); // Switch to flex layout
+            customerInput.required = true;
+            customerInput.focus();
+        } else {
+            customerWrapper.classList.add('hidden');
+            customerWrapper.classList.remove('flex');
+            customerInput.required = false;
         }
+    }
 
-        // Override the native selectedIndex setter to sync label
-        const origSelectedIndexSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex').set;
-        Object.defineProperty(providerSelect, 'selectedIndex', {
-            set: function(val) {
-                origSelectedIndexSetter.call(this, val);
-                syncDropdownLabel();
-            },
-            get: function() {
-                return Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex').get.call(this);
-            }
-        });
-        // === END CUSTOM DROPDOWN ===
-
-        // Load Templates from Database
-        const dbTemplates = @json($priceTemplates ?? []);
-
-        // Helper Functions for Rupiah Formatting
-        function formatRupiah(angka) {
-            if (!angka) return '';
-            let number_string = angka.toString().replace(/[^,\d]/g, '');
-            if (number_string === '') return '';
-            let value = parseInt(number_string);
-            if (isNaN(value)) return '';
-            number_string = value.toString();
-            let split = number_string.split(','),
-                sisa = split[0].length % 3,
-                rupiah = split[0].substr(0, sisa),
-                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-            if (ribuan) {
-                separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
-            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-            return rupiah;
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        let number_string = angka.toString().replace(/[^,\d]/g, '');
+        if (number_string === '') return '';
+        let value = parseInt(number_string);
+        if (isNaN(value)) return '';
+        number_string = value.toString();
+        let split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
         }
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
+    }
 
+    function initializeRow(tr, index) {
+        const nameInput = tr.querySelector('.input-name');
+        const categorySelect = tr.querySelector('.input-category');
+        const providerSelect = tr.querySelector('.input-provider');
+        const costInput = tr.querySelector('.input-cost');
+        const priceInput = tr.querySelector('.input-price');
+
+        // Rupiah Formatters
         [costInput, priceInput].forEach(input => {
             input.addEventListener('input', function(e) {
                 e.target.value = formatRupiah(e.target.value);
             });
         });
 
-        // --- Logic Utama: Cek Template Dulu, Baru Heuristik ---
-        function checkAndApplyTemplate() {
+        // Template Matching Logic (Scoped to Row)
+        const checkTemplate = (specificProvider = null) => {
             const currentName = nameInput.value.toLowerCase().trim();
             if (!currentName) return;
 
-            const selectedProvider = providerSelect.value;
             let bestMatch = null;
             let maxMatchLen = 0;
 
-            // STRATEGI 1: Prioritaskan Template dari Provider yang SEDANG DIPILIH
-            // Tujuannya: Jika user mengetik "Pulsa 5000" (generic) dan mengganti provider, harga ikut berubah
-            if (selectedProvider) {
-                const providerTemplates = dbTemplates.filter(t => t.provider === selectedProvider);
-                providerTemplates.forEach(template => {
+            // Strategy: 
+            // 1. If specificProvider is given (user changed dropdown), prioritize templates from that provider
+            // 2. Fallback to Global Search (user typed name)
+            
+            const effectiveProvider = specificProvider || providerSelect.value;
+            
+            // PRIORITIZE SPECIFIC PROVIDER SEARCH
+            if (effectiveProvider) {
+                 const providerTemplates = dbTemplates.filter(t => t.provider === effectiveProvider);
+                 providerTemplates.forEach(template => {
                     const pattern = template.pattern.toLowerCase();
                     if (currentName.includes(pattern)) {
                          if (pattern.length > maxMatchLen) {
@@ -396,66 +338,47 @@
                 });
             }
 
-            // STRATEGI 2: Jika tidak ada match di provider terpilih (atau belum pilih provider), Cari Global
-            // Ini menangani kasus Auto-Detect (user ketik "Indosat 5k" saat provider kosong atau salah pilih)
-            if (!bestMatch) {
-                // Reset max match len untuk pencarian global agar adil
-                // Tapi kita hanya ganti bestMatch jika kita menemukan match yang LEBIH SPESIFIK (lebih panjang)
-                // Atau jika bestMatch masih null
-                let globalMaxMatchLen = 0;
-                let globalBestMatch = null;
-
-                dbTemplates.forEach(template => {
+            // GLOBAL SEARCH (If no match found yet OR we are in auto-detect mode w/o specific provider)
+            if (!bestMatch && !specificProvider) {
+                 dbTemplates.forEach(template => {
                     const pattern = template.pattern.toLowerCase();
                     if (currentName.includes(pattern)) {
-                        if (pattern.length > globalMaxMatchLen) {
-                             globalMaxMatchLen = pattern.length;
-                             globalBestMatch = template;
+                        if (pattern.length > maxMatchLen) {
+                             maxMatchLen = pattern.length;
+                             bestMatch = template;
                         }
                     }
                 });
-
-                // Gunakan hasil global jika:
-                // 1. Belum ada match lokal
-                // 2. Match global jauh lebih spesifik (pattern lebih panjang) daripada match lokal (opsional, hati-hati di sini)
-                // Saat ini kita pakai logika sederhana: kalau lokal kosong, pakai global.
-                // ATAU jika user mengetik nama provider lain secara eksplisit (misal "Indosat" saat "Telkomsel" dipilih),
-                // maka pattern "Indosat" (7 chars) mungkin lebih spesifik dari "Pulsa" (5 chars).
-                // Mari kita prioritaskan global match JIKA pattern-nya mengandung nama provider yang berbeda? 
-                // Simpelnya: jika globalMatchLen > maxMatchLen, replace.
-                if (globalBestMatch && globalMaxMatchLen > maxMatchLen) {
-                    bestMatch = globalBestMatch;
-                }
             }
 
             if (bestMatch) {
-                console.log("Template found:", bestMatch);
-                
-                // A. Set Provider (Jika global search menemukan provider berbeda, atau memastikan konsistensi)
-                let providerFound = false;
-                // Cek exact match dulu
-                for(let i=0; i<providerSelect.options.length; i++) {
-                     if(providerSelect.options[i].value === bestMatch.provider) {
-                         providerSelect.selectedIndex = i;
-                         providerFound = true;
-                         break;
+                // Apply Provider (Only if we did a global search or need to confirm)
+                if (!specificProvider) {
+                     let providerFound = false;
+                     // Try exact match first
+                     for(let i=0; i<providerSelect.options.length; i++) {
+                         if(providerSelect.options[i].value === bestMatch.provider) {
+                             providerSelect.selectedIndex = i;
+                             providerFound = true;
+                             break;
+                         }
                      }
-                }
-                // Fallback mapping
-                if (!providerFound) {
-                    const map = {'tri': 'Three', 'three': 'Three', '3': 'Three'};
-                    const mapped = map[bestMatch.provider.toLowerCase()];
-                    if (mapped) {
-                         for(let i=0; i<providerSelect.options.length; i++) {
-                            if(providerSelect.options[i].value === mapped) {
-                                providerSelect.selectedIndex = i;
-                                break;
+                     // Fallback
+                     if (!providerFound) {
+                         const map = {'tri': 'Three', 'three': 'Three', '3': 'Three'};
+                         const mapped = map[bestMatch.provider.toLowerCase()];
+                         if (mapped) {
+                             for(let i=0; i<providerSelect.options.length; i++) {
+                                 if(providerSelect.options[i].value === mapped) {
+                                     providerSelect.selectedIndex = i;
+                                     break;
+                                 }
                             }
                         }
-                    }
+                     }
                 }
 
-                // B. Set Category
+                // Apply Category
                 for(let i=0; i<categorySelect.options.length; i++) {
                      if(categorySelect.options[i].getAttribute('data-name') === bestMatch.category) {
                          categorySelect.selectedIndex = i;
@@ -463,96 +386,117 @@
                      }
                 }
 
-                // C. Set Harga
+                // Apply Price
                 costInput.value = formatRupiah(parseInt(bestMatch.cost_price));
                 priceInput.value = formatRupiah(parseInt(bestMatch.price));
 
-                // Visual Feedback
-                [costInput, priceInput, providerSelect, categorySelect].forEach(el => {
-                    el.classList.add('bg-green-50', 'text-green-700', 'transition-colors', 'duration-500');
-                    setTimeout(() => el.classList.remove('bg-green-50', 'text-green-700'), 1000);
+                 // Visual Feedback
+                [costInput, priceInput].forEach(el => {
+                    el.classList.add('bg-green-50', 'text-green-700');
+                    setTimeout(() => el.classList.remove('bg-green-50', 'text-green-700'), 500);
                 });
 
             } else {
-                // 2. Jika Tidak Ada Template, Gunakan Deteksi Manual (Heuristik)
-                const currentProvider = providerSelect.value;
-                if (!currentProvider) {
-                    autoDetectProvider(currentName);
-                }
-                
-                if (categorySelect.value === "") {
-                    autoDetectCategoryFallback(currentName);
-                }
-            }
-        }
-
-        // --- Logic Auto-Detect Provider (Fallback) ---
-        function autoDetectProvider(text) {
-             if (providerSelect.value === "") {
-                const providerMap = {
-                    'tree': 'Three', 'tri': 'Three', '3 ': 'Three',
-                    'telkomsel': 'Telkomsel', 'tsel': 'Telkomsel', 'simpati': 'Telkomsel', 'as ': 'Telkomsel',
-                    'xl': 'XL', 'axis': 'Axis', 'smartfren': 'Smartfren', 'by.u': 'By.U', 'byu': 'By.U',
-                    'dana': 'Dana', 'gopay': 'Gopay', 'shopeepay': 'ShopeePay', 
-                    'token': 'Token', 
-                    'listrik': 'Listrik', 'pln': 'Listrik'
-                };
-                
-                for (const [key, val] of Object.entries(providerMap)) {
-                    if (text.includes(key)) {
-                        for(let i=0; i<providerSelect.options.length; i++) {
-                            if(providerSelect.options[i].value === val) {
-                                providerSelect.selectedIndex = i;
+                // Auto Detect Fallback (Only run on Name changes, not on Provider change if no template found)
+                if (!specificProvider) {
+                     if (providerSelect.value === "") {
+                        const providerMap = {
+                            'tree': 'Three', 'tri': 'Three', '3 ': 'Three',
+                            'telkomsel': 'Telkomsel', 'tsel': 'Telkomsel', 'simpati': 'Telkomsel', 'as ': 'Telkomsel',
+                            'xl': 'XL', 'axis': 'Axis', 'smartfren': 'Smartfren', 'by.u': 'By.U', 'byu': 'By.U',
+                            'dana': 'Dana', 'gopay': 'Gopay', 'shopeepay': 'ShopeePay', 
+                            'token': 'Token', 'listrik': 'Listrik', 'pln': 'Listrik',
+                            'bni': 'BNI', 'bca': 'BCA', 'mandiri': 'Mandiri', 'bri': 'BRI', 'btn': 'BTN'
+                        };
+                        for (const [key, val] of Object.entries(providerMap)) {
+                            if (currentName.includes(key)) {
+                                for(let i=0; i<providerSelect.options.length; i++) {
+                                    if(providerSelect.options[i].value === val) {
+                                        providerSelect.selectedIndex = i;
+                                        break;
+                                    }
+                                }
                                 break;
                             }
                         }
-                        break;
+                    }
+
+                    if (categorySelect.value === "") {
+                        let detectedCategoryName = null;
+                        if (['dana', 'gopay', 'shopeepay', 'ovo', 'linkaja', 'wallet'].some(k => currentName.includes(k))) detectedCategoryName = 'E-Wallet';
+                        else if (['token', 'pln', 'listrik'].some(k => currentName.includes(k))) detectedCategoryName = 'Listrik';
+                        else if (['bni', 'bca', 'mandiri', 'bri', 'btn', 'transfer', 'tf '].some(k => currentName.includes(k))) detectedCategoryName = 'Transfer';
+                        else if (currentName.includes('voucher') || currentName.includes('vc') || currentName.includes('fisik')) detectedCategoryName = 'Voucher';
+                        else if (currentName.includes('data') || currentName.includes('gb') || currentName.includes('quota') || currentName.includes('kuota')) detectedCategoryName = 'Paket Data';
+                        else if (currentName.includes('pulsa') || currentName.includes('isi ulang')) detectedCategoryName = 'Pulsa';
+                        else if (['ff', 'free fire', 'ml', 'mobile legends'].some(k => currentName.includes(k))) detectedCategoryName = 'Top Up Game'; 
+                        
+                        if (detectedCategoryName) {
+                             for(let i=0; i<categorySelect.options.length; i++) {
+                                if(categorySelect.options[i].getAttribute('data-name') === detectedCategoryName) {
+                                    categorySelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
+        };
 
-        function autoDetectCategoryFallback(text) {
-            let detectedCategoryName = null;
-            if (['dana', 'gopay', 'shopeepay', 'ovo', 'linkaja', 'wallet'].some(k => text.includes(k))) detectedCategoryName = 'E-Wallet';
-            else if (['token', 'pln', 'listrik'].some(k => text.includes(k))) detectedCategoryName = 'Listrik';
-            else if (text.includes('voucher') || text.includes('vc') || text.includes('fisik')) detectedCategoryName = 'Voucher';
-            else if (text.includes('data') || text.includes('gb') || text.includes('quota') || text.includes('kuota') || text.includes('freedom') || text.includes('unlimited')) detectedCategoryName = 'Paket Data';
-            else if (text.includes('pulsa') || text.includes('isi ulang')) detectedCategoryName = 'Pulsa';
-            else if (['ff', 'free fire', 'ml', 'mobile legends', 'game', 'top up'].some(k => text.includes(k))) detectedCategoryName = 'Top Up Game'; 
-            
-            if (detectedCategoryName) {
-                for(let i=0; i<categorySelect.options.length; i++) {
-                        if(categorySelect.options[i].getAttribute('data-name') === detectedCategoryName) {
-                            categorySelect.selectedIndex = i;
-                            break;
-                        }
-                }
-            }
-        }
-
-        // Attach Listeners
-        // 1. On Input (Typing) - Optional, can be removed if user strictly wants Enter
-        // nameInput.addEventListener('input', (e) => checkAndApplyTemplate()); 
+        // Events
+        nameInput.addEventListener('blur', () => checkTemplate()); // Global search
         
-        // 2. On Enter Key
+        // --- NEW: Trigger Check on Provider Change ---
+        providerSelect.addEventListener('change', function() {
+             // Pass the new provider value explicitly to force re-check
+             checkTemplate(this.value); 
+        });
+
         nameInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submit
-                checkAndApplyTemplate();
-                // Optional: Move focus to next field (Quantity)
-                document.getElementById('quantity').focus();
+                e.preventDefault();
+                checkTemplate();
+                // ADD NEW ROW on ENTER if name is filled
+                if (nameInput.value.length > 2) {
+                     addRow(); 
+                }
+            }
+        });
+    }
+
+    function submitForm() {
+        const tableBody = document.getElementById('tableBody');
+        const rows = tableBody.querySelectorAll('tr.row-item');
+        let validRowsCount = 0;
+
+        // Clean up empty rows before submit
+        rows.forEach(row => {
+            const nameInput = row.querySelector('.input-name');
+            if (!nameInput.value.trim()) {
+                row.remove();
+            } else {
+                validRowsCount++;
             }
         });
 
-        // 3. On Blur (Lost Focus)
-        nameInput.addEventListener('blur', () => {
-             checkAndApplyTemplate();
-        });
+        if (validRowsCount === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak ada data',
+                text: 'Mohon isi minimal satu transaksi sebelum menyimpan.',
+                confirmButtonColor: '#3b82f6'
+            });
+            // If all removed, maybe add one empty row back so the table isn't empty?
+            if(tableBody.children.length === 0) addRow();
+            return;
+        }
 
-        // 4. Manual Change on Provider/Category still triggers
-        providerSelect.addEventListener('change', checkAndApplyTemplate);
-        categorySelect.addEventListener('change', checkAndApplyTemplate);
-
-    });
+        // Trigger native form submission
+        // We use requestSubmit() if available to trigger HTML5 validation on remaining fields
+        const form = document.getElementById('bulkForm');
+        if (form.reportValidity()) {
+            form.submit();
+        }
+    }
 </script>

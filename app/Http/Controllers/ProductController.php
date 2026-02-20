@@ -57,6 +57,65 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Check if this is a Bulk Request (items array exists)
+        if ($request->has('items') && is_array($request->items)) {
+            
+            $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*.name' => 'required|string|max:255',
+                'items.*.code' => 'required|string',
+                'items.*.category_id' => 'required|exists:categories,id',
+                'items.*.price' => 'required',
+                'items.*.cost_price' => 'nullable',
+                'items.*.stock' => 'required|integer|min:0',
+                'items.*.quantity' => 'nullable|integer|min:1',
+                'items.*.payment_status' => 'required|in:paid,unpaid',
+                'items.*.customer_name' => 'nullable|string|max:255',
+                'items.*.created_at' => 'nullable|date',
+            ]);
+
+            $createdCount = 0;
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($request, &$createdCount) {
+                foreach ($request->items as $item) {
+                    // Sanitize currency inputs
+                    $price = isset($item['price']) ? str_replace(['.', ','], ['', '.'], $item['price']) : 0;
+                    $costPrice = isset($item['cost_price']) ? str_replace(['.', ','], ['', '.'], $item['cost_price']) : 0;
+
+                    $data = [
+                        'name' => $item['name'],
+                        'code' => $item['code'],
+                        'category_id' => $item['category_id'],
+                        'price' => $price, // Initial unit price
+                        'cost_price' => $costPrice, // Initial unit cost
+                        'stock' => $item['stock'],
+                        'payment_status' => $item['payment_status'],
+                        'customer_name' => $item['customer_name'] ?? null,
+                    ];
+
+                    // Handle Qty & Totals
+                    $quantity = (int) ($item['quantity'] ?? 1);
+                    $data['quantity'] = $quantity;
+
+                    if ($quantity > 1) {
+                        $data['price'] = $price * $quantity;
+                        $data['cost_price'] = $costPrice * $quantity;
+                    }
+
+                    // Handle Date
+                    if (!empty($item['created_at'])) {
+                        $data['created_at'] = $item['created_at'] . ' ' . now()->format('H:i:s');
+                    }
+
+                    Product::create($data);
+                    $createdCount++;
+                }
+            });
+
+            return redirect()->route('products.index')->with('success', $createdCount . ' Transaksi berhasil ditambahkan!');
+        }
+
+        // 2. Fallback to Single Item Logic (Existing)
         // Sanitize: remove thousand separators (.) and convert comma (,) to dot (.)
         $price = $request->filled('price') ? str_replace(['.', ','], ['', '.'], $request->price) : 0;
         $costPrice = $request->filled('cost_price') ? str_replace(['.', ','], ['', '.'], $request->cost_price) : 0;
@@ -93,8 +152,6 @@ class ProductController extends Controller
             $data['cost_price'] = $costPrice * $quantity;
         }
 
-        // Search Filter (Not relevant here, but keeping context clean)
-        
         // If a custom date is provided, ensure it includes the current time or defaults
         if ($request->has('created_at') && $request->created_at != null) {
              $data['created_at'] = $request->created_at . ' ' . now()->format('H:i:s');

@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Restu Cell') }}</title>
+        <title>Konter POS</title>
+        <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,9 +38,9 @@
 
             <div class="relative z-10 flex flex-col items-center">
                 <a href="/">
-                    <!-- Logo icon or generic -->
-                    <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm mb-6 border border-white/30 text-white">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <!-- Logo Image -->
+                    <div class="mb-6 transform hover:scale-105 transition-transform duration-300">
+                         <img src="{{ asset('images/logo.png') }}" alt="Restu Cell Logo" class="w-24 h-24 object-contain drop-shadow-lg">
                     </div>
                 </a>
                 

@@ -40,7 +40,7 @@
                         <label class="md:col-span-4 text-sm font-bold text-slate-700">Provider:</label>
                         <div class="md:col-span-8">
                              <select name="code" class="w-full border-slate-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm text-black px-3 py-1.5">
-                                @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends'] as $provider)
+                                @foreach(['Telkomsel', 'Three', 'XL', 'Axis', 'Smartfren', 'Indosat', 'Dana', 'Gopay', 'ShopeePay', 'Token', 'Listrik', 'BNI', 'BCA', 'Mandiri', 'BRI', 'BTN', 'Pajak', 'Tarik Tunai', 'Free Fire', 'Mobile Legends', 'Lainnya'] as $provider)
                                     <option value="{{ $provider }}" {{ old('code', $product->code) == $provider ? 'selected' : '' }}>
                                         {{ $provider }}
                                     </option>
