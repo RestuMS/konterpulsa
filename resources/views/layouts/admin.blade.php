@@ -114,6 +114,11 @@
                     <span class="font-medium">Perbandingan</span>
                 </a>
 
+                <a href="{{ route('expenses.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('expenses.*') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-orange-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                    <span class="font-medium">Pengeluaran</span>
+                </a>
+
                 <a href="{{ route('price-templates.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('price-templates.*') ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-l-4 border-pink-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="font-medium">Setting Harga</span>

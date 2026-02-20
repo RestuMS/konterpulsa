@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,12 +35,19 @@ class ProductController extends Controller
         $totalsQuery = clone $query;
         $totalCost = $totalsQuery->sum('cost_price');
         $totalRevenue = $totalsQuery->sum('price');
-        $totalProfit = $totalRevenue - $totalCost;
+
+        // Total pengeluaran operasional bulan ini
+        $totalExpense = Expense::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('amount');
+
+        // Laba = (Pemasukan - Modal) - Pengeluaran Operasional
+        $totalProfit = $totalRevenue - $totalCost - $totalExpense;
 
         $products = $query->paginate(10);
         $totalProducts = $totalsQuery->sum('quantity');
 
-        return view('products.index', compact('products', 'totalCost', 'totalRevenue', 'totalProfit', 'totalProducts'));
+        return view('products.index', compact('products', 'totalCost', 'totalRevenue', 'totalExpense', 'totalProfit', 'totalProducts'));
     }
 
     /**

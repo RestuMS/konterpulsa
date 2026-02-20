@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                         {{ __('Laporan') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
+                        {{ __('Pengeluaran') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('price-templates.index')" :active="request()->routeIs('price-templates.*')">
                         {{ __('Setting Harga') }}
                     </x-nav-link>
@@ -84,6 +87,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                 {{ __('Laporan') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
+                {{ __('Pengeluaran') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('price-templates.index')" :active="request()->routeIs('price-templates.*')">
                 {{ __('Setting Harga') }}

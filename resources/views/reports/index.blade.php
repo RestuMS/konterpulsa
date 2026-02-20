@@ -89,13 +89,13 @@
                 </div>
             </div>
 
-            <!-- Pengeluaran -->
+            <!-- Modal -->
             <div class="bg-red-600 rounded-2xl p-5 md:px-8 flex flex-col md:flex-row md:items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">
                 <div class="flex items-center gap-4 z-10 mb-4 md:mb-0">
                     <div class="w-12 h-12 rounded-xl bg-red-700/50 flex items-center justify-center border border-red-500/30 shrink-0">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
-                    <h3 class="text-lg md:text-xl font-bold text-white tracking-wide uppercase">PENGELUARAN</h3>
+                    <h3 class="text-lg md:text-xl font-bold text-white tracking-wide uppercase">MODAL</h3>
                 </div>
                 <div class="text-left md:text-right z-10 pl-16 md:pl-0 -mt-2 md:mt-0">
                     <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Rp {{ number_format($totalCost, 0, ',', '.') }}</h2>
@@ -105,6 +105,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pengeluaran Operasional -->
+            <a href="{{ route('expenses.index') }}" class="bg-orange-500 rounded-2xl p-5 md:px-8 flex flex-col md:flex-row md:items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300 hover:bg-orange-600">
+                <div class="flex items-center gap-4 z-10 mb-4 md:mb-0">
+                    <div class="w-12 h-12 rounded-xl bg-orange-600/50 flex items-center justify-center border border-orange-400/30 shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-white tracking-wide uppercase">PENGELUARAN</h3>
+                </div>
+                <div class="text-left md:text-right z-10 pl-16 md:pl-0 -mt-2 md:mt-0">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h2>
+                    <div class="flex items-center md:justify-end gap-1 text-white/80 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                        <span>Operasional</span>
+                    </div>
+                </div>
+            </a>
 
             <!-- Laba Bersih -->
             <div class="bg-blue-600 rounded-2xl p-5 md:px-8 flex flex-col md:flex-row md:items-center justify-between shadow-lg relative overflow-hidden group hover:scale-[1.01] transition-transform duration-300">

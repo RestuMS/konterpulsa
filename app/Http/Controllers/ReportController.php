@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\Product;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -77,9 +78,16 @@ class ReportController extends Controller
 
             $totalRevenue = $totals->total_revenue;
             $totalCost = $totals->total_cost;
-            $totalProfit = $totalRevenue - $totalCost;
 
-            return compact('chartLabels', 'chartDatasets', 'totalRevenue', 'totalCost', 'totalProfit');
+            // Total pengeluaran operasional
+            $totalExpense = Expense::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('amount');
+
+            // Laba = (Pemasukan - Modal) - Pengeluaran Operasional
+            $totalProfit = $totalRevenue - $totalCost - $totalExpense;
+
+            return compact('chartLabels', 'chartDatasets', 'totalRevenue', 'totalCost', 'totalExpense', 'totalProfit');
         });
 
         return view('reports.index', array_merge(
@@ -101,7 +109,14 @@ class ReportController extends Controller
 
         $totalRevenue = $totals->total_revenue;
         $totalCost = $totals->total_cost;
-        $totalProfit = $totalRevenue - $totalCost;
+
+        // Total pengeluaran operasional
+        $totalExpense = Expense::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->sum('amount');
+
+        // Laba = (Pemasukan - Modal) - Pengeluaran Operasional
+        $totalProfit = $totalRevenue - $totalCost - $totalExpense;
 
         $monthName = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
 
@@ -113,7 +128,7 @@ class ReportController extends Controller
                             ->take(3)
                             ->get();
 
-        return view('reports.print', compact('totalRevenue', 'totalCost', 'totalProfit', 'monthName', 'topProducts'));
+        return view('reports.print', compact('totalRevenue', 'totalCost', 'totalExpense', 'totalProfit', 'monthName', 'topProducts'));
     }
 
     /**
@@ -148,13 +163,23 @@ class ReportController extends Controller
 
             $currentRevenue = $currentTotals->total_revenue;
             $currentCost = $currentTotals->total_cost;
-            $currentProfit = $currentRevenue - $currentCost;
             $currentItems = $currentTotals->total_items;
+
+            // Pengeluaran operasional bulan ini
+            $currentExpense = Expense::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('amount');
+            $currentProfit = $currentRevenue - $currentCost - $currentExpense;
 
             $prevRevenue = $prevTotals->total_revenue;
             $prevCost = $prevTotals->total_cost;
-            $prevProfit = $prevRevenue - $prevCost;
             $prevItems = $prevTotals->total_items;
+
+            // Pengeluaran operasional bulan lalu
+            $prevExpense = Expense::whereMonth('created_at', $prevMonth)
+                ->whereYear('created_at', $prevYear)
+                ->sum('amount');
+            $prevProfit = $prevRevenue - $prevCost - $prevExpense;
 
             // Percentage changes
             $revenueChange = $prevRevenue > 0 ? round((($currentRevenue - $prevRevenue) / $prevRevenue) * 100, 1) : ($currentRevenue > 0 ? 100 : 0);

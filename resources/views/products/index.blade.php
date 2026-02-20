@@ -66,8 +66,7 @@
     </div>
 
     <!-- Summary Cards -->
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         
         <!-- Pemasukan (Green) -->
         <div class="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl p-5 shadow-lg text-white">
@@ -83,16 +82,11 @@
                     <p class="text-emerald-100 text-sm font-medium mb-1">Pemasukan</p>
                     <h3 class="text-2xl font-bold">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
                 </div>
-                <div class="mt-4 flex items-center gap-2 text-xs text-emerald-100/80">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Total Potensi</span>
-                </div>
             </div>
-             <!-- Decor Icon -->
              <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
 
-        <!-- Pengeluaran (Red) -->
+        <!-- Modal (Red) -->
         <div class="relative overflow-hidden bg-gradient-to-br from-rose-500 to-rose-700 rounded-xl p-5 shadow-lg text-white">
             <div class="absolute right-0 top-0 h-full w-1/2 bg-white/5 skew-x-12 transform origin-bottom-left"></div>
             <div class="relative z-10 flex flex-col justify-between h-full">
@@ -103,17 +97,30 @@
                      <span class="text-xs font-medium bg-rose-800/30 px-2 py-1 rounded text-rose-100">Modal</span>
                 </div>
                 <div>
-                     <p class="text-rose-100 text-sm font-medium mb-1">Pengeluaran</p>
+                     <p class="text-rose-100 text-sm font-medium mb-1">Modal</p>
                     <h3 class="text-2xl font-bold">Rp {{ number_format($totalCost, 0, ',', '.') }}</h3>
                 </div>
-                <div class="mt-4 flex items-center gap-2 text-xs text-rose-100/80">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Total Stok</span>
-                </div>
             </div>
-             <!-- Decor Icon -->
             <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
         </div>
+
+        <!-- Pengeluaran Operasional (Orange) -->
+        <a href="{{ route('expenses.index') }}" class="relative overflow-hidden bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl p-5 shadow-lg text-white group hover:shadow-orange-500/30 transition-shadow">
+            <div class="absolute right-0 top-0 h-full w-1/2 bg-white/5 skew-x-12 transform origin-bottom-left"></div>
+            <div class="relative z-10 flex flex-col justify-between h-full">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+                    </div>
+                     <span class="text-xs font-medium bg-orange-800/30 px-2 py-1 rounded text-orange-100">Operasional</span>
+                </div>
+                <div>
+                     <p class="text-orange-100 text-sm font-medium mb-1">Pengeluaran</p>
+                    <h3 class="text-2xl font-bold">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h3>
+                </div>
+            </div>
+            <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+        </a>
 
         <!-- Laba (Sky Blue/Cyan) -->
         <div class="relative overflow-hidden bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl p-5 shadow-lg text-white">
@@ -126,15 +133,10 @@
                      <span class="text-xs font-medium bg-sky-800/30 px-2 py-1 rounded text-sky-100">Bersih</span>
                 </div>
                  <div>
-                    <p class="text-sky-100 text-sm font-medium mb-1">Laba</p>
+                    <p class="text-sky-100 text-sm font-medium mb-1">Laba Bersih</p>
                     <h3 class="text-2xl font-bold">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h3>
                 </div>
-                <div class="mt-4 flex items-center gap-2 text-xs text-sky-100/80">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Estimasi</span>
-                </div>
             </div>
-             <!-- Decor Icon -->
              <svg class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
         </div>
 

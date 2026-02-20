@@ -35,6 +35,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/print', [ReportController::class, 'print'])->name('reports.print');
     Route::get('/reports/comparison', [ReportController::class, 'comparison'])->name('reports.comparison');
 
+    // Pengeluaran Operasional
+    Route::resource('expenses', ExpenseController::class);
+
     // 🔐 KHUSUS ADMIN
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('users', UserController::class);

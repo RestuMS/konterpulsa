@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Expense;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +26,14 @@ class DashboardController extends Controller
 
             $totalRevenue = $totals->total_revenue;
             $totalCost = $totals->total_cost;
-            $totalProfit = $totalRevenue - $totalCost;
+
+            // Total pengeluaran operasional bulan ini
+            $totalExpense = Expense::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('amount');
+
+            // Laba = (Pemasukan - Modal) - Pengeluaran Operasional
+            $totalProfit = $totalRevenue - $totalCost - $totalExpense;
 
             // Single query for counts
             $outOfStockCount = Product::where('stock', '<=', 0)->count();
@@ -87,7 +95,7 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            return compact('totalRevenue', 'totalCost', 'totalProfit', 'outOfStockCount', 'totalProducts', 'chartLabels', 'chartDatasets', 'topProducts');
+            return compact('totalRevenue', 'totalCost', 'totalExpense', 'totalProfit', 'outOfStockCount', 'totalProducts', 'chartLabels', 'chartDatasets', 'topProducts');
         });
 
         return view('dashboard', $dashboardData);
